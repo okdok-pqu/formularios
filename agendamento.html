@@ -930,6 +930,15 @@ Enviado em: ${ts}`;
 
   try { await sendEmail({ subject: `PRIMEIRA CONSULTA — ${nome}`, body, name: nome, pdf }); }
   catch (e) { console.error(e); }
+
+  // Email de confirmação para o paciente
+  try {
+    await emailjs.send(CFG.serviceId, 'template_ezh3i8t', {
+      patient_email: email,
+      patient_name:  nome,
+    });
+  } catch (e) { console.error('Confirmação ao paciente falhou:', e); }
+
   showOk('new', nome, email);
 }
 
