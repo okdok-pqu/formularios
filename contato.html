@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contato — Dr. Albert Mojzeszowicz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+:root {
+  --navy:   #001941;
+  --mid:    #1D2244;
+  --copper: #D7824B;
+  --teal:   #2A7F6F;
+  --cream:  #F8F6F2;
+  --grey:   #E4E2DE;
+  --muted:  #9A9899;
+  --fill:   #4A4A4A;
+  --error:  #B03020;
+  --fb: 'DM Sans', sans-serif;
+  --ft: 'Playfair Display', serif;
+  --r: 6px;
+  --tr: 0.18s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-height:100vh;padding:40px 20px 80px}
+.shell{max-width:600px;margin:0 auto}
+
+/* ── Progress ── */
+.prog-wrap{display:flex;align-items:center;gap:5px;margin-bottom:32px}
+.prog-bar{flex:1;height:3px;background:var(--grey);border-radius:2px;transition:background .4s}
+.prog-bar.done{background:var(--navy)}
+.prog-bar.cur{background:var(--navy)}
+.prog-lbl{font-size:12px;color:var(--muted);letter-spacing:.04em;margin-left:8px;white-space:nowrap}
+
+/* ── Card ── */
+.card{background:#fff;border-radius:10px;padding:40px 44px;box-shadow:0 4px 6px rgba(19,28,71,.04), 0 10px 40px rgba(19,28,71,.10)}
+@media(max-width:520px){.card{padding:26px 20px}}
+
+/* ── Steps ── */
+.step{display:none}.step.on{display:block}
+
+/* ── Typography ── */
+.ttl{font-family:var(--ft);font-size:26px;font-weight:400;color:var(--navy);margin-bottom:6px;line-height:1.2}
+.sub{font-size:14px;color:var(--muted);margin-bottom:30px;line-height:1.5}
+
+/* ── Fields ── */
+.f{margin-bottom:20px}
+.f label{display:block;font-size:13px;font-weight:500;color:var(--mid);margin-bottom:7px;letter-spacing:.02em}
+.f label .req{color:var(--copper);margin-left:2px}
+.f input,.f select,.f textarea{width:100%;padding:11px 14px;border:1.5px solid var(--grey);border-radius:var(--r);font-family:var(--fb);font-size:15px;color:var(--mid);background:#fff;transition:border-color var(--tr);outline:none;-webkit-appearance:none;appearance:none}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--teal)}
+.f textarea{resize:vertical;min-height:80px}
+.f .ferr{display:none;font-size:12px;color:var(--error);margin-top:5px}
+.f.err input,.f.err select,.f.err textarea{border-color:var(--error)}
+.f.err .ferr{display:block}
+.ph-row{display:flex;gap:8px}
+.ph-row select{width:126px;flex-shrink:0}
+.ph-row input{flex:1}
+.char-count{font-size:11px;color:var(--muted);text-align:right;margin-top:4px}
+
+/* ── Bifurc cards ── */
+.bifc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+@media(max-width:480px){.bifc{grid-template-columns:1fr}}
+.bc{border:2px solid var(--grey);border-radius:8px;padding:18px 14px;cursor:pointer;transition:border-color var(--tr),background var(--tr);text-align:center;user-select:none}
+.bc:hover{border-color:var(--teal)}
+.bc.sel{border-color:var(--teal);background:rgba(42,127,111,.06)}
+.bc-ico{width:36px;height:36px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
+.bc-ico svg{width:36px;height:36px;stroke:var(--muted);transition:stroke var(--tr)}
+.bc.sel .bc-ico svg{stroke:var(--teal)}
+.bc:hover .bc-ico svg{stroke:var(--teal)}
+.bc-ttl{font-family:var(--ft);font-size:14px;color:var(--navy);margin-bottom:4px;line-height:1.3}
+.bc-dsc{font-size:12px;color:var(--muted);line-height:1.4}
+
+/* ── Responsible toggle ── */
+.resp-tog{display:flex;align-items:center;gap:10px;margin-bottom:18px;cursor:pointer;user-select:none}
+.resp-tog input{width:18px;height:18px;accent-color:var(--teal);cursor:pointer}
+.resp-tog span{font-size:14px;color:var(--mid)}
+.resp-blk{display:none;background:var(--cream);border-radius:8px;padding:20px;margin-bottom:18px}
+.resp-blk.on{display:block}
+.blk-lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+
+/* ── Option cards ── */
+.oc-list{display:flex;flex-direction:column;gap:10px}
+.oc{border:2px solid var(--grey);border-radius:8px;padding:15px 16px;cursor:pointer;transition:border-color var(--tr),background var(--tr);display:flex;align-items:flex-start;gap:12px;user-select:none}
+.oc:hover{border-color:var(--copper)}
+.oc.sel{border-color:var(--copper);background:rgba(215,130,75,.05)}
+.oc-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--grey);flex-shrink:0;margin-top:2px;transition:border-color var(--tr),background var(--tr);display:flex;align-items:center;justify-content:center}
+.oc.sel .oc-dot{border-color:var(--copper);background:var(--copper)}
+.oc.sel .oc-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
+.oc-ttl{font-size:15px;font-weight:500;color:var(--navy);margin-bottom:3px}
+.oc-dsc{font-size:13px;color:var(--muted);line-height:1.4}
+
+/* ── Availability grid ── */
+.av-wrap{border:1.5px solid var(--grey);border-radius:var(--r);overflow:hidden;margin-bottom:6px}
+.av-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.av-tbl th{padding:9px 12px;text-align:center;font-weight:500;color:var(--muted);background:#fafafa;border-bottom:1.5px solid var(--grey)}
+.av-tbl th:first-child{text-align:left;padding-left:14px}
+.av-tbl td{padding:0;text-align:center;border-bottom:1px solid var(--grey)}
+.av-tbl tr:last-child td{border-bottom:none}
+.av-tbl td:first-child{font-weight:500;color:var(--mid);text-align:left;padding:10px 12px 10px 14px}
+/* Checkbox cell — styled toggle */
+.av-cell{position:relative;width:60px;height:44px;display:table-cell;vertical-align:middle}
+.av-cell input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
+.av-cell label{display:flex;align-items:center;justify-content:center;width:100%;height:100%;cursor:pointer}
+.av-cell label span{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:5px;
+  background:var(--grey);
+  transition:background var(--tr),transform .1s;
+  font-size:14px;color:transparent;
+  user-select:none;
+}
+.av-cell input:checked + label span{
+  background:var(--fill);
+  color:#fff;
+  transform:scale(1.05);
+}
+.av-cell label:hover span{background:#ccc}
+.av-cell input:checked + label:hover span{background:#333}
+
+/* ── Contract ── */
+.ct-prev{border:1.5px solid var(--grey);border-radius:var(--r);padding:18px 20px;max-height:240px;overflow-y:auto;font-size:13px;color:var(--mid);line-height:1.65;margin-bottom:12px;background:#fafafa}
+.ct-prev h3{font-family:var(--ft);font-size:15px;font-weight:400;margin-bottom:10px;color:var(--navy)}
+.ct-prev h4{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:12px 0 5px}
+.ct-prev p,.ct-prev li{margin-bottom:5px}
+.ct-prev ul{padding-left:16px}
+.ct-lnk{font-size:13px;color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(42,127,111,.3);cursor:pointer;transition:border-color var(--tr)}
+.ct-lnk:hover{border-color:var(--teal)}
+.acc-row{display:flex;align-items:flex-start;gap:12px;margin-top:16px;padding:14px 16px;border:1.5px solid var(--grey);border-radius:var(--r);background:#fff;cursor:pointer;transition:border-color var(--tr)}
+.acc-row:hover{border-color:var(--teal)}
+.acc-row input{width:20px;height:20px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;margin-top:1px}
+.acc-txt{font-size:14px;color:var(--mid);line-height:1.5}
+
+/* ── Buttons ── */
+.btn-row{display:flex;gap:10px;margin-top:28px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 26px;border-radius:var(--r);font-family:var(--fb);font-size:15px;font-weight:500;cursor:pointer;transition:all var(--tr);border:none;outline:none}
+.btn-p{background:var(--navy);color:#fff}
+.btn-p:hover{opacity:.88}
+.btn-p:disabled{background:var(--grey);color:var(--muted);cursor:not-allowed}
+.btn-g{background:transparent;color:var(--muted);border:1.5px solid var(--grey)}
+.btn-g:hover{border-color:var(--mid);color:var(--mid)}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.btn-p.ld .spin{display:inline-block}
+.btn-p.ld .lbl{display:none}
+
+/* ── Divider ── */
+hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
+
+/* ── Success ── */
+.succ{display:none;text-align:center;padding:16px 0 8px}
+.succ.on{display:block}
+.succ-ico{width:60px;height:60px;border-radius:50%;background:rgba(42,127,111,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px}
+.succ h2{font-family:var(--ft);font-size:23px;font-weight:400;color:var(--navy);margin-bottom:10px}
+.succ p{font-size:14px;color:var(--muted);line-height:1.6;max-width:360px;margin:0 auto}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Progress -->
+  <div class="prog-wrap" id="pw">
+    <div class="prog-bar cur" id="pb0"></div>
+    <div class="prog-bar" id="pb1"></div>
+    <div class="prog-bar" id="pb2"></div>
+    <div class="prog-bar" id="pb3"></div>
+    <div class="prog-bar" id="pb4"></div>
+    <span class="prog-lbl" id="plbl">Etapa 1 de 5</span>
+  </div>
+
+  <div class="card">
+
+    <!-- ══ STEP 0 : Bifurcação ══ -->
+    <div class="step on" id="s0">
+      <div class="ttl">Olá. Vamos começar.</div>
+      <div class="sub">Como posso ajudar você hoje?</div>
+      <div class="bifc">
+        <div class="bc" id="bc_ret" onclick="pickFlow('ret')">
+          <div class="bc-ico">
+            <!-- calendar with checkmark — returning patient -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <polyline points="9,14 11,16 15,12"/>
+            </svg>
+          </div>
+          <div class="bc-ttl">Sou paciente em acompanhamento</div>
+          <div class="bc-dsc">Quero marcar uma consulta de retorno</div>
+        </div>
+        <div class="bc" id="bc_new" onclick="pickFlow('new')">
+          <div class="bc-ico">
+            <!-- user with plus — new patient -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="10" cy="7" r="4"/>
+              <path d="M2 21c0-4 3.6-7 8-7"/>
+              <line x1="19" y1="13" x2="19" y2="19"/>
+              <line x1="16" y1="16" x2="22" y2="16"/>
+            </svg>
+          </div>
+          <div class="bc-ttl">É minha primeira consulta</div>
+          <div class="bc-dsc">Quero iniciar um novo acompanhamento</div>
+        </div>
+      </div>
+      <div class="btn-row" style="justify-content:flex-end">
+        <button class="btn btn-p" id="b0next" onclick="goFromS0()" disabled>
+          <span class="lbl">Continuar →</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ STEP RETORNO ══ -->
+    <div class="step" id="sR">
+      <div class="ttl">Consulta de retorno</div>
+      <div class="sub">Confirme seus dados e preferência de horário.</div>
+
+      <div class="f" id="fR_nome">
+        <label>Nome completo <span class="req">*</span></label>
+        <input type="text" id="r_nome" placeholder="Como consta no seu cadastro">
+        <span class="ferr">Campo obrigatório</span>
+      </div>
+
+      <hr class="dv">
+
+      <div class="f">
+        <label>Disponibilidade <span class="req">*</span></label>
+        <div class="av-wrap">
+          <table class="av-tbl" id="r_av">
+            <thead><tr><th></th><th>Manhã</th><th>Tarde</th><th>Noite</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Seg – Ter</td>
+                <td class="av-cell"><input type="checkbox" id="rST_m" data-s="Seg-Ter Manhã"><label for="rST_m"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="rST_t" data-s="Seg-Ter Tarde"><label for="rST_t"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="rST_n" data-s="Seg-Ter Noite"><label for="rST_n"><span>✓</span></label></td>
+              </tr>
+              <tr>
+                <td>Qua – Qui</td>
+                <td class="av-cell"><input type="checkbox" id="rQQ_m" data-s="Qua-Qui Manhã"><label for="rQQ_m"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="rQQ_t" data-s="Qua-Qui Tarde"><label for="rQQ_t"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="rQQ_n" data-s="Qua-Qui Noite"><label for="rQQ_n"><span>✓</span></label></td>
+              </tr>
+              <tr>
+                <td>Sexta</td>
+                <td class="av-cell"><input type="checkbox" id="rSx_m" data-s="Sex Manhã"><label for="rSx_m"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="rSx_t" data-s="Sex Tarde"><label for="rSx_t"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="rSx_n" data-s="Sex Noite"><label for="rSx_n"><span>✓</span></label></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ferr" id="r_av_err" style="display:none">Selecione ao menos um período</div>
+      </div>
+
+      <div class="f">
+        <label>Algum assunto específico? <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+        <textarea id="r_obs" placeholder="Pode deixar em branco"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-g" onclick="goto('s0')">← Voltar</button>
+        <button class="btn btn-p" id="bRsub" onclick="submitRet()">
+          <span class="lbl">Enviar solicitação</span><span class="spin"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 1 : Dados pessoais ══ -->
+    <div class="step" id="s1">
+      <div class="ttl">Seus dados</div>
+      <div class="sub">Informações necessárias para o cadastro.</div>
+
+      <label class="resp-tog">
+        <input type="checkbox" id="chkResp" onchange="togResp()">
+        <span>Estou agendando para outra pessoa (filho, familiar, etc.)</span>
+      </label>
+
+      <div class="f" id="f_nome"><label>Nome completo do paciente <span class="req">*</span></label><input type="text" id="p_nome" placeholder="Nome completo"><span class="ferr">Campo obrigatório</span></div>
+      <div class="f" id="f_nasc"><label>Data de nascimento <span class="req">*</span></label><input type="date" id="p_nasc"><span class="ferr">Campo obrigatório</span></div>
+      <div class="f" id="f_cpf"><label>CPF <span class="req">*</span></label><input type="text" id="p_cpf" placeholder="000.000.000-00" maxlength="14" oninput="mCPF(this)"><span class="ferr">CPF inválido</span></div>
+      <div class="f" id="f_tel">
+        <label>Celular <span class="req">*</span></label>
+        <div class="ph-row">
+          <select id="p_ddi"><option value="+55">🇧🇷 +55</option><option value="+1">🇺🇸 +1</option><option value="+39">🇮🇹 +39</option><option value="+351">🇵🇹 +351</option><option value="+49">🇩🇪 +49</option><option value="+34">🇪🇸 +34</option></select>
+          <input type="tel" id="p_tel" placeholder="(11) 99999-9999" oninput="mTel(this)">
+        </div>
+        <span class="ferr">Campo obrigatório</span>
+      </div>
+      <div class="f" id="f_email"><label>E-mail <span class="req">*</span></label><input type="email" id="p_email" placeholder="seu@email.com"><span class="ferr">E-mail inválido</span></div>
+
+      <div class="resp-blk" id="respBlk">
+        <div class="blk-lbl">Dados de quem está agendando</div>
+        <div class="f" id="f_r_nome"><label>Nome do responsável <span class="req">*</span></label><input type="text" id="resp_nome" placeholder="Nome completo"><span class="ferr">Campo obrigatório</span></div>
+        <div class="f" id="f_r_tel">
+          <label>Celular do responsável <span class="req">*</span></label>
+          <div class="ph-row">
+            <select id="resp_ddi"><option value="+55">🇧🇷 +55</option><option value="+1">🇺🇸 +1</option><option value="+39">🇮🇹 +39</option></select>
+            <input type="tel" id="resp_tel" placeholder="(11) 99999-9999" oninput="mTel(this)">
+          </div>
+          <span class="ferr">Campo obrigatório</span>
+        </div>
+        <div class="f"><label>Relação com o paciente</label><input type="text" id="resp_rel" placeholder="Ex: mãe, pai, cônjuge…"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-g" onclick="goto('s0')">← Voltar</button>
+        <button class="btn btn-p" onclick="valS1()"><span class="lbl">Continuar →</span></button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 2 : Farmacogenética ══ -->
+    <div class="step" id="s2">
+      <div class="ttl">Testagem farmacogenética</div>
+      <div class="sub">Qual é o seu interesse em relação à testagem farmacogenética?</div>
+      <div class="oc-list">
+        <div class="oc" id="oc_sim" onclick="pickFarma('sim')">
+          <div class="oc-dot"></div>
+          <div><div class="oc-ttl">Quero incluir a testagem</div><div class="oc-dsc">Quero personalizar o tratamento com base no meu perfil genético</div></div>
+        </div>
+        <div class="oc" id="oc_nao" onclick="pickFarma('nao')">
+          <div class="oc-dot"></div>
+          <div><div class="oc-ttl">Prefiro iniciar sem testagem</div><div class="oc-dsc">Quero começar pelo protocolo clínico padrão</div></div>
+        </div>
+        <div class="oc" id="oc_nd" onclick="pickFarma('nd')">
+          <div class="oc-dot"></div>
+          <div><div class="oc-ttl">Ainda não sei</div><div class="oc-dsc">Prefiro discutir na primeira consulta antes de decidir</div></div>
+        </div>
+      </div>
+      <div class="ferr" id="farma_err" style="display:none;margin-top:10px">Selecione uma opção para continuar</div>
+      <div class="btn-row">
+        <button class="btn btn-g" onclick="goto('s1')">← Voltar</button>
+        <button class="btn btn-p" onclick="valS2()"><span class="lbl">Continuar →</span></button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 3 : Disponibilidade ══ -->
+    <div class="step" id="s3">
+      <div class="ttl">Disponibilidade</div>
+      <div class="sub">Selecione os períodos em que você está disponível. Ingrid entrará em contato para confirmar o horário exato.</div>
+      <div class="f">
+        <div class="av-wrap">
+          <table class="av-tbl" id="n_av">
+            <thead><tr><th></th><th>Manhã</th><th>Tarde</th><th>Noite</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Seg – Ter</td>
+                <td class="av-cell"><input type="checkbox" id="nST_m" data-s="Seg-Ter Manhã"><label for="nST_m"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="nST_t" data-s="Seg-Ter Tarde"><label for="nST_t"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="nST_n" data-s="Seg-Ter Noite"><label for="nST_n"><span>✓</span></label></td>
+              </tr>
+              <tr>
+                <td>Qua – Qui</td>
+                <td class="av-cell"><input type="checkbox" id="nQQ_m" data-s="Qua-Qui Manhã"><label for="nQQ_m"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="nQQ_t" data-s="Qua-Qui Tarde"><label for="nQQ_t"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="nQQ_n" data-s="Qua-Qui Noite"><label for="nQQ_n"><span>✓</span></label></td>
+              </tr>
+              <tr>
+                <td>Sexta</td>
+                <td class="av-cell"><input type="checkbox" id="nSx_m" data-s="Sex Manhã"><label for="nSx_m"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="nSx_t" data-s="Sex Tarde"><label for="nSx_t"><span>✓</span></label></td>
+                <td class="av-cell"><input type="checkbox" id="nSx_n" data-s="Sex Noite"><label for="nSx_n"><span>✓</span></label></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ferr" id="n_av_err" style="display:none">Selecione ao menos um período</div>
+      </div>
+      <div class="f">
+        <label>Observações de agenda <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+        <textarea id="n_obs" placeholder="Restrições específicas, urgências, preferências…"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-g" onclick="goto('s2')">← Voltar</button>
+        <button class="btn btn-p" onclick="valS3()"><span class="lbl">Continuar →</span></button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 4 : Contrato ══ -->
+    <div class="step" id="s4">
+      <div class="ttl">Contrato terapêutico</div>
+      <div class="sub">Leia as condições do atendimento antes de confirmar.</div>
+      <div class="ct-prev">
+        <h3>CONTRATO TERAPÊUTICO</h3>
+        <p><em>Consulta Psiquiátrica Particular — Condições do atendimento | Direitos e responsabilidades</em></p>
+        <p style="margin-top:8px">Este documento serve para tornar o tratamento previsível para os dois lados: o paciente sabe o que pode esperar; o médico pode trabalhar com organização e dedicação.</p>
+        <h4>1. Obrigações do Médico</h4>
+        <ul>
+          <li>Conduzir as consultas com base no conhecimento científico e nos princípios da Declaração de Genebra.</li>
+          <li>Manter sigilo sobre todas as informações clínicas e pessoais do paciente, mesmo após sua morte.</li>
+          <li>Comunicar diagnósticos e responder dúvidas de forma acessível.</li>
+          <li>Prescrever medicamentos com base em critérios clínicos.</li>
+          <li>Comunicar cancelamentos com 24h de antecedência.</li>
+          <li>Responder mensagens fora do horário em até 24–48 horas úteis.</li>
+          <li>Fornecer resumo clínico ou prontuário a qualquer momento.</li>
+        </ul>
+        <h4>2. Responsabilidades do Paciente</h4>
+        <ul>
+          <li>Cancelar consultas com 1 dia de antecedência.</li>
+          <li>Colher exames solicitados antes da próxima consulta.</li>
+          <li>Comunicar desejo de alterar prescrição antes de fazê-lo.</li>
+          <li>Utilizar medicamentos conforme orientado.</li>
+        </ul>
+        <h4>3. Honorários e Cancelamentos</h4>
+        <ul>
+          <li>Com 1 dia ou mais de antecedência: sem cobrança.</li>
+          <li>No dia ou sem aviso: 50% do valor da consulta.</li>
+          <li>Cancelamentos do médico: sem ônus, reagendamento prioritário.</li>
+        </ul>
+        <h4>4. Comunicação Fora da Consulta</h4>
+        <p>WhatsApp em horário comercial. Agendamentos: Ingrid (11) 97105-7112. Avaliações e novos medicamentos requerem consulta.</p>
+        <h4>5. Plano de Segurança</h4>
+        <p>Em crise aguda: SAMU (192) ou CVV (188). Dirija-se ao Pronto-Socorro sem aguardar retorno.</p>
+        <h4>6. Telepsiquiatria</h4>
+        <p>Consultas por vídeo seguem as mesmas condições. Ambiente reservado e conexão estável.</p>
+        <h4>7. Vigência</h4>
+        <p>Prazo indeterminado a partir do aceite digital.</p>
+      </div>
+      <a class="ct-lnk" onclick="openPDF()">Ler contrato completo em nova aba ↗</a>
+      <div class="acc-row" onclick="togAcc()">
+        <input type="checkbox" id="chkAcc" onclick="event.stopPropagation();updAcc()">
+        <div class="acc-txt">Li e aceito os termos do <strong>Contrato Terapêutico</strong> do Dr. Albert Felipe Mojzeszowicz (CRM-SP 175671).</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-g" onclick="goto('s3')">← Voltar</button>
+        <button class="btn btn-p" id="bSub" onclick="submitNew()" disabled>
+          <span class="lbl">Confirmar agendamento</span><span class="spin"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ STEP FALE COMIGO ══ -->
+    <div class="step" id="sFale">
+      <div class="ttl">Fale comigo</div>
+      <div class="sub">Envie sua mensagem. Responderei em até 48h úteis.</div>
+
+      <div class="f" id="fF_nome">
+        <label>Nome <span class="req">*</span></label>
+        <input type="text" id="f_nome_fale" placeholder="Seu nome">
+        <span class="ferr">Campo obrigatório</span>
+      </div>
+
+      <div class="f" id="fF_contato">
+        <label>E-mail ou celular <span class="req">*</span></label>
+        <input type="text" id="f_contato" placeholder="seu@email.com ou (11) 99999-9999">
+        <span class="ferr">Informe ao menos um contato</span>
+      </div>
+
+      <div class="f" id="fF_assunto">
+        <label>Assunto <span class="req">*</span></label>
+        <select id="f_assunto">
+          <option value="">— selecione —</option>
+          <option value="Dúvida sobre a consulta">Dúvida sobre a consulta</option>
+          <option value="Dúvida sobre farmacogenética">Dúvida sobre farmacogenética</option>
+          <option value="Profissional de saúde / encaminhamento">Sou profissional de saúde / encaminhamento</option>
+          <option value="Imprensa / parceria">Imprensa / parceria</option>
+          <option value="Outro assunto">Outro assunto</option>
+        </select>
+        <span class="ferr">Selecione um assunto</span>
+      </div>
+
+      <div class="f">
+        <label>Mensagem <span class="req">*</span></label>
+        <textarea id="f_msg" placeholder="Descreva sua dúvida ou mensagem…" maxlength="500" oninput="updChar()" rows="4"></textarea>
+        <div class="char-count"><span id="charN">0</span> / 500</div>
+        <span class="ferr" id="f_msg_err">Campo obrigatório</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-g" onclick="goto('s0')">← Voltar</button>
+        <button class="btn btn-p" id="bFsub" onclick="submitFale()">
+          <span class="lbl">Enviar mensagem</span><span class="spin"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ SUCCESS ══ -->
+    <div class="succ" id="sOk">
+      <div class="succ-ico">✓</div>
+      <h2>Mensagem enviada</h2>
+      <p id="sOkMsg"></p>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /shell -->
+
+<script>
+// ════════════════════════════════════════════════
+// ⚙️  CONFIGURAÇÃO
+// ════════════════════════════════════════════════
+const CFG = {
+  publicKey:  'bCpmHcOurtfjJ6WgS',
+  serviceId:  'service_gsug3hj',
+  templateId: 'template_h8yb635',
+  destEmail:  'albert@albertpsiquiatra.com.br',
+};
+const READY = true;
+emailjs.init(CFG.publicKey);
+
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+let flow = null, farma = null, acceptTS = null;
+
+// ════════════════════════════════════════════════
+// ENTRY POINT — abre direto no Fale comigo
+// ════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  hideProg();
+  goto('sFale');
+});
+
+// ════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════
+function goto(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0, 0);
+}
+
+function setProgress(cur, total) {
+  for (let i = 0; i < 5; i++) {
+    const b = document.getElementById('pb' + i);
+    b.classList.remove('cur', 'done');
+    if (i < cur - 1) b.classList.add('done');
+    else if (i === cur - 1) b.classList.add('cur');
+  }
+  document.getElementById('plbl').textContent = `Etapa ${cur} de ${total}`;
+}
+
+function hideProg() {
+  document.getElementById('pw').style.display = 'none';
+}
+
+// ════════════════════════════════════════════════
+// STEP 0
+// ════════════════════════════════════════════════
+function pickFlow(f) {
+  flow = f;
+  ['ret', 'new'].forEach(k => {
+    const el = document.getElementById('bc_' + k);
+    if (el) el.classList.toggle('sel', k === f);
+  });
+  document.getElementById('b0next').disabled = false;
+}
+
+function goFromS0() {
+  if (!flow) return;
+  if (flow === 'ret')  { goto('sR');    setProgress(1, 2); }
+  if (flow === 'new')  { goto('s1');    setProgress(1, 5); }
+  if (flow === 'fale') { goto('sFale'); hideProg(); }
+}
+
+// ════════════════════════════════════════════════
+// MASKS & VALIDATORS
+// ════════════════════════════════════════════════
+function mCPF(el) {
+  let v = el.value.replace(/\D/g, '');
+  if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+  else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+  else if (v.length > 3) v = v.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+  el.value = v;
+}
+function mTel(el) {
+  let v = el.value.replace(/\D/g, '');
+  if (v.length > 10) v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+  else if (v.length > 6) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+  else if (v.length > 2) v = v.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+  el.value = v;
+}
+function okCPF(c) {
+  c = c.replace(/\D/g, '');
+  if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
+  let s = 0; for (let i = 0; i < 9; i++) s += +c[i] * (10 - i);
+  let r = (s * 10) % 11; if (r === 10 || r === 11) r = 0; if (r !== +c[9]) return false;
+  s = 0; for (let i = 0; i < 10; i++) s += +c[i] * (11 - i);
+  r = (s * 10) % 11; if (r === 10 || r === 11) r = 0; return r === +c[10];
+}
+function req(fid, iid, fn) {
+  const el = document.getElementById(fid), v = document.getElementById(iid).value.trim();
+  const ok = fn ? fn(v) : v.length > 0;
+  el.classList.toggle('err', !ok); return ok;
+}
+function updChar() {
+  document.getElementById('charN').textContent = document.getElementById('f_msg').value.length;
+}
+
+// ════════════════════════════════════════════════
+// STEP 1
+// ════════════════════════════════════════════════
+function togResp() {
+  document.getElementById('respBlk').classList.toggle('on', document.getElementById('chkResp').checked);
+}
+function valS1() {
+  const ok = [
+    req('f_nome', 'p_nome'),
+    req('f_nasc', 'p_nasc'),
+    req('f_cpf', 'p_cpf', v => okCPF(v)),
+    req('f_tel', 'p_tel', v => v.replace(/\D/g, '').length >= 10),
+    req('f_email', 'p_email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)),
+  ].every(Boolean);
+  let okR = true;
+  if (document.getElementById('chkResp').checked) {
+    okR = [
+      req('f_r_nome', 'resp_nome'),
+      req('f_r_tel', 'resp_tel', v => v.replace(/\D/g, '').length >= 10),
+    ].every(Boolean);
+  }
+  if (ok && okR) { goto('s2'); setProgress(2, 5); }
+}
+
+// ════════════════════════════════════════════════
+// STEP 2
+// ════════════════════════════════════════════════
+function pickFarma(v) {
+  farma = v;
+  ['sim', 'nao', 'nd'].forEach(k => document.getElementById('oc_' + k).classList.toggle('sel', k === v));
+  document.getElementById('farma_err').style.display = 'none';
+}
+function valS2() {
+  if (!farma) { document.getElementById('farma_err').style.display = 'block'; return; }
+  goto('s3'); setProgress(3, 5);
+}
+
+// ════════════════════════════════════════════════
+// STEP 3
+// ════════════════════════════════════════════════
+function getSlots(tid) {
+  return Array.from(document.querySelectorAll(`#${tid} input[type=checkbox]:checked`)).map(c => c.dataset.s);
+}
+function valS3() {
+  const s = getSlots('n_av');
+  if (!s.length) { document.getElementById('n_av_err').style.display = 'block'; return; }
+  document.getElementById('n_av_err').style.display = 'none';
+  goto('s4'); setProgress(4, 5);
+}
+
+// ════════════════════════════════════════════════
+// STEP 4 — CONTRACT
+// ════════════════════════════════════════════════
+function togAcc() { const c = document.getElementById('chkAcc'); c.checked = !c.checked; updAcc(); }
+function updAcc() {
+  const c = document.getElementById('chkAcc').checked;
+  document.getElementById('bSub').disabled = !c;
+  if (c) acceptTS = new Date().toISOString();
+}
+
+function buildPDFDoc() {
+  const { jsPDF } = window.jspdf, doc = new jsPDF();
+  const nome  = document.getElementById('p_nome').value.trim();
+  const nasc  = document.getElementById('p_nasc').value;
+  const cpf   = document.getElementById('p_cpf').value.trim();
+  const tel   = document.getElementById('p_ddi').value + ' ' + document.getElementById('p_tel').value.trim();
+  const email = document.getElementById('p_email').value.trim();
+  const hoje  = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  const nascFmt = nasc ? new Date(nasc + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+
+  const rows = [
+    { b: true, sz: 12, t: 'CONTRATO TERAPÊUTICO' },
+    { t: 'Dr. Albert Felipe Mojzeszowicz — CRM-SP 175671' },
+    { t: '' },
+    { b: true, t: 'ACEITE DIGITAL' },
+    { t: `Aceito por: ${nome}` },
+    { t: `CPF: ${cpf}` },
+    { t: `Timestamp: ${new Date(acceptTS).toLocaleString('pt-BR')}` },
+    { t: '' },
+    { b: true, t: 'IDENTIFICAÇÃO DO PACIENTE' },
+    { t: `Nome:         ${nome}` },
+    { t: `Nascimento:   ${nascFmt}` },
+    { t: `CPF:          ${cpf}` },
+    { t: `Telefone:     ${tel.trim()}` },
+    { t: `E-mail:       ${email}` },
+    { t: '' },
+    { t: '─────────────────────────────────────────────' },
+    { t: '' },
+    { b: true, t: 'CONDIÇÕES DO ATENDIMENTO' },
+    { t: '' },
+    { b: true, t: '1. Obrigações do Médico' },
+    { t: '• Conduzir consultas com base no conhecimento científico e na Declaração de Genebra.' },
+    { t: '• Manter sigilo das informações clínicas e pessoais, mesmo após a morte do paciente.' },
+    { t: '• Comunicar diagnósticos de forma acessível e responder dúvidas.' },
+    { t: '• Prescrever medicamentos com base em critérios clínicos.' },
+    { t: '• Comunicar cancelamentos com 24h de antecedência.' },
+    { t: '• Responder mensagens fora do horário em até 24–48h úteis.' },
+    { t: '• Fornecer resumo clínico ou prontuário a qualquer momento.' },
+    { t: '' },
+    { b: true, t: '2. Responsabilidades do Paciente' },
+    { t: '• Cancelar consultas com 1 dia de antecedência.' },
+    { t: '• Colher exames solicitados antes da próxima consulta.' },
+    { t: '• Comunicar desejo de alterar prescrição antes de fazê-lo.' },
+    { t: '• Utilizar medicamentos conforme orientado.' },
+    { t: '' },
+    { b: true, t: '3. Honorários e Cancelamentos' },
+    { t: '• 1 dia ou mais de antecedência: sem cobrança.' },
+    { t: '• No dia ou sem aviso: 50% do valor da consulta.' },
+    { t: '' },
+    { b: true, t: '4. Comunicação' },
+    { t: 'WhatsApp em horário comercial. Agendamentos: Ingrid (11) 97105-7112.' },
+    { t: '' },
+    { b: true, t: '5. Plano de Segurança' },
+    { t: 'Crise aguda: SAMU (192) ou CVV (188).' },
+    { t: '' },
+    { b: true, t: '6. Telepsiquiatria' },
+    { t: 'Consultas por vídeo seguem as mesmas condições.' },
+    { t: '' },
+    { t: '─────────────────────────────────────────────' },
+    { t: '' },
+    { t: `Local e data: _________________________, ${hoje}` },
+    { t: '' },
+    { t: '' },
+    { t: '_______________________________          _______________________________' },
+    { t: `Dr. Albert Felipe Mojzeszowicz           ${nome}` },
+    { t: 'CRM-SP 175671                            Paciente (aceite digital)' },
+  ];
+
+  let y = 18;
+  rows.forEach(({ t, b, sz }) => {
+    if (y > 272) { doc.addPage(); y = 18; }
+    doc.setFont('helvetica', b ? 'bold' : 'normal');
+    doc.setFontSize(sz || 9.5);
+    doc.text(t, 18, y);
+    y += (t === '' ? 4 : 6);
+  });
+  return doc;
+}
+
+function openPDF() {
+  try {
+    window.open(buildPDFDoc().output('bloburl'), '_blank');
+  } catch (e) {
+    alert('Preencha seus dados (etapa 1) antes de visualizar o contrato personalizado.');
+  }
+}
+
+// ════════════════════════════════════════════════
+// EMAIL DISPATCH
+// ════════════════════════════════════════════════
+async function sendEmail({ subject, body, name, pdf }) {
+  if (!READY) {
+    console.log('📧 DEV — subject:', subject);
+    console.log(body);
+    await new Promise(r => setTimeout(r, 800));
+    return;
+  }
+  await emailjs.send(CFG.serviceId, CFG.templateId, {
+    to_email: CFG.destEmail,
+    subject, message: body,
+    patient_name: name,
+    pdf_base64: pdf || '',
+  });
+}
+
+// ════════════════════════════════════════════════
+// SUBMIT — RETORNO
+// ════════════════════════════════════════════════
+async function submitRet() {
+  const nome = document.getElementById('r_nome').value.trim();
+  document.getElementById('fR_nome').classList.toggle('err', !nome);
+  if (!nome) return;
+  const slots = getSlots('r_av');
+  if (!slots.length) { document.getElementById('r_av_err').style.display = 'block'; return; }
+  document.getElementById('r_av_err').style.display = 'none';
+
+  const btn = document.getElementById('bRsub');
+  btn.classList.add('ld'); btn.disabled = true;
+
+  const obs = document.getElementById('r_obs').value.trim();
+  const ts  = new Date().toLocaleString('pt-BR');
+
+  const body =
+`════════════════════════════════════
+RETORNO — ${nome}
+════════════════════════════════════
+
+Paciente : ${nome}
+Enviado  : ${ts}
+
+
+DISPONIBILIDADE
+
+${slots.map(s => '  • ' + s).join('\n')}
+
+
+${obs ? 'OBSERVAÇÕES\n\n' + obs : '(sem observações específicas)'}
+
+════════════════════════════════════`;
+
+  try { await sendEmail({ subject: `RETORNO — ${nome}`, body, name: nome }); }
+  catch (e) { console.error(e); }
+  showOk('ret', nome);
+}
+
+// ════════════════════════════════════════════════
+// SUBMIT — NOVO PACIENTE
+// ════════════════════════════════════════════════
+async function submitNew() {
+  const btn = document.getElementById('bSub');
+  btn.classList.add('ld'); btn.disabled = true;
+
+  const nome  = document.getElementById('p_nome').value.trim();
+  const nasc  = document.getElementById('p_nasc').value;
+  const cpf   = document.getElementById('p_cpf').value.trim();
+  const ddi   = document.getElementById('p_ddi').value;
+  const tel   = ddi + ' ' + document.getElementById('p_tel').value.trim();
+  const email = document.getElementById('p_email').value.trim();
+  const nascFmt = nasc ? new Date(nasc + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+  const farmaMap = { sim: 'Sim — quer testagem', nao: 'Não — protocolo padrão', nd: 'A decidir na consulta' };
+  const slots = getSlots('n_av');
+  const obs   = document.getElementById('n_obs').value.trim();
+  const ts    = new Date().toLocaleString('pt-BR');
+
+  let resp = '';
+  if (document.getElementById('chkResp').checked) {
+    const rNome = document.getElementById('resp_nome').value.trim();
+    const rTel  = document.getElementById('resp_ddi').value + ' ' + document.getElementById('resp_tel').value.trim();
+    const rRel  = document.getElementById('resp_rel').value.trim() || 'não informado';
+    resp = `Nome           : ${rNome}\nCelular        : ${rTel}\nRelação        : ${rRel}`;
+  }
+
+  const body =
+`════════════════════════════════════
+PRIMEIRA CONSULTA — ${nome}
+════════════════════════════════════
+
+DADOS DO PACIENTE
+
+Nome           : ${nome}
+Nascimento     : ${nascFmt}
+CPF            : ${cpf}
+Celular        : ${tel.trim()}
+E-mail         : ${email}
+${resp ? '\nRESPONSÁVEL\n' + resp.trim() : ''}
+
+────────────────────────────────────
+
+FARMACOGENÉTICA  ${farmaMap[farma]}
+
+DISPONIBILIDADE
+
+${slots.map(s => '  • ' + s).join('\n')}
+
+${obs ? 'OBSERVAÇÕES\n\n' + obs + '\n' : ''}
+────────────────────────────────────
+
+CONTRATO TERAPÊUTICO
+
+Aceito digitalmente em: ${new Date(acceptTS).toLocaleString('pt-BR')}
+PDF do contrato em anexo.
+
+════════════════════════════════════
+Enviado em: ${ts}`;
+
+  let pdf = '';
+  try { pdf = buildPDFDoc().output('datauristring').split(',')[1]; } catch (e) {}
+
+  try { await sendEmail({ subject: `PRIMEIRA CONSULTA — ${nome}`, body, name: nome, pdf }); }
+  catch (e) { console.error(e); }
+  showOk('new', nome);
+}
+
+// ════════════════════════════════════════════════
+// SUBMIT — FALE COMIGO
+// ════════════════════════════════════════════════
+async function submitFale() {
+  const ok = [
+    req('fF_nome',    'f_nome_fale'),
+    req('fF_contato', 'f_contato'),
+    req('fF_assunto', 'f_assunto'),
+  ].every(Boolean);
+  const msg = document.getElementById('f_msg').value.trim();
+  const msgEl = document.getElementById('f_msg');
+  msgEl.parentElement.classList.toggle('err', !msg);
+  document.getElementById('f_msg_err').style.display = msg ? 'none' : 'block';
+  if (!ok || !msg) return;
+
+  const btn = document.getElementById('bFsub');
+  btn.classList.add('ld'); btn.disabled = true;
+
+  const nome    = document.getElementById('f_nome_fale').value.trim();
+  const contato = document.getElementById('f_contato').value.trim();
+  const assunto = document.getElementById('f_assunto').value;
+  const ts      = new Date().toLocaleString('pt-BR');
+
+  const body =
+`════════════════════════════════════
+FALE COMIGO — ${assunto}
+════════════════════════════════════
+
+Nome     : ${nome}
+Contato  : ${contato}
+Enviado  : ${ts}
+
+────────────────────────────────────
+
+MENSAGEM
+
+${msg}
+
+════════════════════════════════════`;
+
+  try { await sendEmail({ subject: `FALE COMIGO — ${assunto}`, body, name: nome }); }
+  catch (e) { console.error(e); }
+  showOk('fale', nome);
+}
+
+// ════════════════════════════════════════════════
+// SUCCESS SCREEN
+// ════════════════════════════════════════════════
+function showOk(type, nome) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('on'));
+  hideProg();
+  const msgs = {
+    ret:  `${nome}, sua solicitação foi recebida. Em breve a Ingrid entrará em contato para confirmar o horário.`,
+    new:  `${nome}, seus dados foram recebidos. A Ingrid entrará em contato para combinar o horário da sua primeira consulta.`,
+    fale: `${nome}, sua mensagem foi recebida. Responderei em até 48h úteis.`,
+  };
+  document.getElementById('sOk').querySelector('h2').textContent =
+    type === 'fale' ? 'Mensagem enviada' : 'Solicitação enviada';
+  document.getElementById('sOkMsg').textContent = msgs[type];
+  document.getElementById('sOk').classList.add('on');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
