@@ -150,6 +150,14 @@ body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-h
 /* ── Divider ── */
 hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
 
+/* ── No-email fallback ── */
+.no-email-wrap{margin-top:8px}
+.no-email-lnk{font-size:12px;color:var(--muted);border-bottom:1px solid rgba(154,152,153,.4);cursor:pointer;transition:color var(--tr),border-color var(--tr)}
+.no-email-lnk:hover{color:var(--mid);border-color:var(--mid)}
+.no-email-note{display:none;align-items:flex-start;gap:9px;background:rgba(0,25,65,.04);border:1px solid rgba(0,25,65,.1);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--mid);line-height:1.55;margin-bottom:4px}
+.no-email-note.on{display:flex}
+.no-email-note svg{flex-shrink:0;margin-top:1px;stroke:var(--muted)}
+
 /* ── Success ── */
 .succ{display:none;text-align:center;padding:16px 0 8px}
 .succ.on{display:block}
@@ -222,6 +230,22 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         <label>Nome completo <span class="req">*</span></label>
         <input type="text" id="r_nome" placeholder="Como consta no seu cadastro">
         <span class="ferr">Campo obrigatório</span>
+      </div>
+
+      <div class="f" id="fR_email">
+        <label>E-mail cadastrado <span class="req">*</span></label>
+        <input type="email" id="r_email" placeholder="seu@email.com">
+        <span class="ferr">E-mail inválido</span>
+        <label class="resp-tog" style="margin-top:10px;margin-bottom:0">
+          <input type="checkbox" id="chkNoEmail" onchange="togNoEmail()">
+          <span>Não lembro qual email cadastrei</span>
+        </label>
+      </div>
+
+      <!-- nota exibida quando paciente não lembra o email -->
+      <div class="no-email-note" id="noEmailNote">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Sem problema — sua solicitação será enviada normalmente. Como não teremos seu email, você não receberá uma confirmação por escrito, mas minha secretária entrará em contato até o final do dia para confirmar o horário.
       </div>
 
       <hr class="dv">
@@ -760,12 +784,45 @@ async function sendEmail({ subject, body, name, pdf }) {
 }
 
 // ════════════════════════════════════════════════
+// RETORNO — email toggle
+// ════════════════════════════════════════════════
+let retSemEmail = false;
+
+function togNoEmail() {
+  retSemEmail = document.getElementById('chkNoEmail').checked;
+  const emailField = document.getElementById('fR_email');
+  const note       = document.getElementById('noEmailNote');
+  const input      = document.getElementById('r_email');
+
+  if (retSemEmail) {
+    emailField.style.opacity = '0.4';
+    emailField.style.pointerEvents = 'none';
+    input.value = '';
+    note.classList.add('on');
+  } else {
+    emailField.style.opacity = '1';
+    emailField.style.pointerEvents = 'auto';
+    note.classList.remove('on');
+  }
+}
+
+// ════════════════════════════════════════════════
 // SUBMIT — RETORNO
 // ════════════════════════════════════════════════
 async function submitRet() {
   const nome = document.getElementById('r_nome').value.trim();
   document.getElementById('fR_nome').classList.toggle('err', !nome);
   if (!nome) return;
+
+  // Validar email só se o paciente não clicou em "não lembro"
+  let emailRet = '';
+  if (!retSemEmail) {
+    emailRet = document.getElementById('r_email').value.trim();
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRet);
+    document.getElementById('fR_email').classList.toggle('err', !emailOk);
+    if (!emailOk) return;
+  }
+
   const slots = getSlots('r_av');
   if (!slots.length) { document.getElementById('r_av_err').style.display = 'block'; return; }
   document.getElementById('r_av_err').style.display = 'none';
@@ -782,6 +839,7 @@ RETORNO — ${nome}
 ════════════════════════════════════
 
 Paciente : ${nome}
+E-mail   : ${emailRet || '(não informado)'}
 Enviado  : ${ts}
 
 
@@ -796,7 +854,7 @@ ${obs ? 'OBSERVAÇÕES\n\n' + obs : '(sem observações específicas)'}
 
   try { await sendEmail({ subject: `RETORNO — ${nome}`, body, name: nome }); }
   catch (e) { console.error(e); }
-  showOk('ret', nome);
+  showOk(retSemEmail ? 'ret_sem_email' : 'ret', nome);
 }
 
 // ════════════════════════════════════════════════
@@ -864,7 +922,7 @@ Enviado em: ${ts}`;
 
   try { await sendEmail({ subject: `PRIMEIRA CONSULTA — ${nome}`, body, name: nome, pdf }); }
   catch (e) { console.error(e); }
-  showOk('new', nome);
+  showOk('new', nome, email);
 }
 
 // ════════════════════════════════════════════════
@@ -915,17 +973,18 @@ ${msg}
 // ════════════════════════════════════════════════
 // SUCCESS SCREEN
 // ════════════════════════════════════════════════
-function showOk(type, nome) {
+function showOk(type, nome, email) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('on'));
   hideProg();
   const msgs = {
-    ret:  `${nome}, sua solicitação foi recebida. Em breve a Ingrid entrará em contato para confirmar o horário.`,
-    new:  `${nome}, seus dados foram recebidos. A Ingrid entrará em contato para combinar o horário da sua primeira consulta.`,
-    fale: `${nome}, sua mensagem foi recebida. Responderei em até 48h úteis.`,
+    ret:          `<strong>${nome}</strong>, sua solicitação foi recebida. Em breve você receberá um email de confirmação e a minha secretária entrará em contato ainda hoje para agendar o seu horário.<br><br>Obrigado pela confiança no meu trabalho.`,
+    ret_sem_email:`<strong>${nome}</strong>, sua solicitação foi recebida. Como não temos seu email cadastrado, não será enviada uma confirmação por escrito — mas minha secretária entrará em contato até o final do dia para agendar o seu horário.<br><br>Obrigado pela confiança no meu trabalho.`,
+    new:          `<strong>${nome}</strong>, sua solicitação foi recebida com sucesso. Em breve você receberá um email de confirmação no endereço <strong>${email}</strong> e a minha secretária entrará em contato ainda hoje para agendar o seu horário.`,
+    fale:         `<strong>${nome}</strong>, sua mensagem foi recebida. Responderei em até 48h úteis.`,
   };
   document.getElementById('sOk').querySelector('h2').textContent =
     type === 'fale' ? 'Mensagem enviada' : 'Solicitação enviada';
-  document.getElementById('sOkMsg').textContent = msgs[type];
+  document.getElementById('sOkMsg').innerHTML = msgs[type];
   document.getElementById('sOk').classList.add('on');
   window.scrollTo(0, 0);
 }
