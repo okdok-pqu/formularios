@@ -150,15 +150,19 @@ body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-h
 /* ── Divider ── */
 hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
 
-/* ── No-email fallback ── */
-.no-email-wrap{margin-top:8px}
-.no-email-lnk{font-size:12px;color:var(--muted);border-bottom:1px solid rgba(154,152,153,.4);cursor:pointer;transition:color var(--tr),border-color var(--tr)}
-.no-email-lnk:hover{color:var(--mid);border-color:var(--mid)}
-.no-email-note{display:none;align-items:flex-start;gap:9px;background:rgba(0,25,65,.04);border:1px solid rgba(0,25,65,.1);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--mid);line-height:1.55;margin-bottom:4px}
+/* ── No-email toggle ── */
+.noemail-tog{display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;user-select:none}
+.noemail-tog input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
+.noemail-box{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--muted);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background var(--tr),border-color var(--tr)}
+.noemail-tog input:checked ~ .noemail-box{background:var(--teal);border-color:var(--teal)}
+.noemail-box svg{display:none;width:10px;height:10px;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.noemail-tog input:checked ~ .noemail-box svg{display:block}
+.noemail-lbl{font-size:13px;color:var(--mid);line-height:1}
+
+/* ── No-email note ── */
+.no-email-note{display:none;align-items:flex-start;gap:9px;background:rgba(0,25,65,.04);border:1px solid rgba(0,25,65,.1);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--mid);line-height:1.55;margin-top:10px;margin-bottom:4px}
 .no-email-note.on{display:flex}
 .no-email-note svg{flex-shrink:0;margin-top:1px;stroke:var(--muted)}
-
-/* ── Success ── */
 .succ{display:none;text-align:center;padding:16px 0 8px}
 .succ.on{display:block}
 .succ-ico{width:60px;height:60px;border-radius:50%;background:rgba(42,127,111,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px}
@@ -236,9 +240,12 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         <label>E-mail cadastrado <span class="req">*</span></label>
         <input type="email" id="r_email" placeholder="seu@email.com">
         <span class="ferr">E-mail inválido</span>
-        <label class="resp-tog" style="margin-top:10px;margin-bottom:0">
+        <label class="noemail-tog">
           <input type="checkbox" id="chkNoEmail" onchange="togNoEmail()">
-          <span>Não lembro qual email cadastrei</span>
+          <span class="noemail-box">
+            <svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3"/></svg>
+          </span>
+          <span class="noemail-lbl">Não lembro qual email cadastrei</span>
         </label>
       </div>
 
@@ -790,18 +797,19 @@ let retSemEmail = false;
 
 function togNoEmail() {
   retSemEmail = document.getElementById('chkNoEmail').checked;
-  const emailField = document.getElementById('fR_email');
+  const emailInput = document.getElementById('r_email');
   const note       = document.getElementById('noEmailNote');
-  const input      = document.getElementById('r_email');
+  const emailErr   = document.getElementById('fR_email');
 
   if (retSemEmail) {
-    emailField.style.opacity = '0.4';
-    emailField.style.pointerEvents = 'none';
-    input.value = '';
+    emailInput.style.opacity = '0.4';
+    emailInput.style.pointerEvents = 'none';
+    emailInput.value = '';
+    emailErr.classList.remove('err');
     note.classList.add('on');
   } else {
-    emailField.style.opacity = '1';
-    emailField.style.pointerEvents = 'auto';
+    emailInput.style.opacity = '1';
+    emailInput.style.pointerEvents = 'auto';
     note.classList.remove('on');
   }
 }
