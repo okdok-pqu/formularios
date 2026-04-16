@@ -6,280 +6,284 @@
 <title>Onde a Testagem Genética Ajuda</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    background: #ffffff;
-    color: #001941;
-    padding: 40px 24px 60px;
-    min-height: 100vh;
-  }
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  background: #ffffff;
+  color: #001941;
+  padding: 40px 24px 60px;
+  min-height: 100vh;
+}
 
-  .root {
-    max-width: 980px;
-    margin: 0 auto;
-    color: #001941;
-  }
+.root {
+  max-width: 860px;
+  margin: 0 auto;
+  color: #001941;
+}
 
-  .section-label {
-    font-family: 'Playfair Display', serif;
-    font-size: 39px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    text-align: center;
-    color: #001941;
-    margin-bottom: 33px;
-    font-weight: 500;
-  }
+/* ── Header ── */
+.section-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  color: #001941;
+  margin-bottom: 28px;
+  font-weight: 500;
+  line-height: 1.2;
+}
 
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    margin-bottom: 44px;
-    justify-content: center;
-  }
+/* ── Legend ── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-bottom: 40px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: #001941;
+}
+.legend-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ld-high  { background: #1870FD; }
+.ld-mod   { background: #7aaee8; }
+.ld-neut  { background: rgba(136,135,128,0.5); }
+.ld-unkn  { background: #D98242; }
 
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 16px;
-    color: #001941;
-  }
+/* ── Card grid ── */
+.card-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
 
-  .legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+/* ── Accordion card ── */
+.ac {
+  border-bottom: 0.5px solid rgba(0,25,65,0.12);
+}
+.ac:first-child { border-top: 0.5px solid rgba(0,25,65,0.12); }
 
-  .ld-green { background: #1870FD; }
-  .ld-teal  { background: #D3E3FB; border: 1px solid #a0b8e0; }
-  .ld-gray  { background: #888780; }
-  .ld-amber { background: #D98242; }
+.ac-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 4px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.ac-header:hover .ac-title { color: #1870FD; }
 
-  /* ── Desktop table ── */
-  .matrix {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
-  }
+.ac-left { flex: 1; min-width: 0; }
 
-  .matrix th {
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: #001941;
-    padding: 8px 12px;
-    text-align: center;
-    border-bottom: 1px solid rgba(0,25,65,0.15);
-  }
+.ac-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #001941;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  transition: color 0.15s;
+}
 
-  .matrix th.col-q {
-    text-align: center;
-    width: 38%;
-    padding-left: 0;
-  }
+.ac-sub {
+  font-size: 12px;
+  color: rgba(0,25,65,0.50);
+  line-height: 1.4;
+}
 
-  .matrix td {
-    padding: 11px 12px;
-    border-bottom: 0.5px solid rgba(0,25,65,0.10);
-    vertical-align: middle;
-    text-align: center;
-  }
+.ac-insight {
+  font-size: 12px;
+  color: rgba(0,25,65,0.55);
+  margin-top: 5px;
+  font-style: italic;
+  line-height: 1.4;
+}
 
-  .matrix td.col-q {
-    text-align: left;
-    padding-left: 0;
-    font-size: 16px;
-    color: #001941;
-    line-height: 1.45;
-  }
+/* chevron */
+.ac-chevron {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(0,25,65,0.05);
+  transition: background 0.15s;
+}
+.ac-chevron svg {
+  width: 12px; height: 12px;
+  stroke: rgba(0,25,65,0.40);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.22s ease;
+}
+.ac.open .ac-chevron { background: rgba(24,112,253,0.10); }
+.ac.open .ac-chevron svg { transform: rotate(180deg); stroke: #1870FD; }
 
-  .matrix td.col-q .sub {
-    font-size: 13px;
-    color: rgba(0,25,65,0.55);
-    margin-top: 2px;
-  }
+/* bars panel */
+.ac-body {
+  display: none;
+  padding: 0 4px 20px;
+}
+.ac.open .ac-body { display: block; }
 
-  .matrix tr:last-child td { border-bottom: none; }
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.bar-row:last-child { margin-bottom: 0; }
 
-  /* ── Pills ── */
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    white-space: nowrap;
-    line-height: 1.2;
-    color: #001941;
-  }
+.bar-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(0,25,65,0.50);
+  width: 100px;
+  flex-shrink: 0;
+  line-height: 1;
+}
 
-  .p-high { background: rgba(24,112,253,0.15); border: 0.5px solid #1870FD; }
-  .p-mod  { background: #D3E3FB; border: 0.5px solid #a0b8e0; }
-  .p-neut { background: rgba(136,135,128,0.12); border: 0.5px solid #888780; }
-  .p-unkn { background: rgba(217,130,66,0.15); border: 0.5px solid #D98242; }
+.bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(0,25,65,0.07);
+  border-radius: 3px;
+  overflow: hidden;
+}
 
-  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .d-high { background: #1870FD; }
-  .d-mod  { background: #a0b8e0; }
-  .d-neut { background: #888780; }
-  .d-unkn { background: #D98242; }
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
 
-  /* ── Mobile cards (hidden on desktop) ── */
-  .mobile-cards { display: none; }
+.fill-high { background: #1870FD; width: 100%; }
+.fill-mod  { background: #7aaee8; width: 50%; }
+.fill-neut { background: rgba(136,135,128,0.35); width: 7%; }
+.fill-unkn { background: #D98242; width: 25%; }
 
-  .mc {
-    border-bottom: 0.5px solid rgba(0,25,65,0.10);
-    padding: 16px 0;
-  }
-  .mc:last-child { border-bottom: none; }
+.bar-tag {
+  font-size: 10px;
+  color: rgba(0,25,65,0.38);
+  width: 76px;
+  flex-shrink: 0;
+  text-align: right;
+  line-height: 1;
+}
 
-  .mc-question {
-    font-size: 15px;
-    font-weight: 500;
-    color: #001941;
-    line-height: 1.4;
-    margin-bottom: 4px;
-  }
+/* ── Limitations section ── */
+.limit-block {
+  margin-top: 48px;
+  border-top: 1px solid rgba(0,25,65,0.12);
+  padding-top: 36px;
+}
 
-  .mc-sub {
-    font-size: 12px;
-    color: rgba(0,25,65,0.55);
-    margin-bottom: 12px;
-    line-height: 1.4;
-  }
+.limit-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  color: #001941;
+  font-weight: 500;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
 
-  .mc-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
+/* limit cards reuse ac styles */
+.lc {
+  border-bottom: 0.5px solid rgba(0,25,65,0.12);
+}
+.lc:first-child { border-top: 0.5px solid rgba(0,25,65,0.12); }
 
-  .mc-pill-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-  }
+.lc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 4px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.lc-header:hover .lc-title { color: #1870FD; }
 
-  .mc-col-label {
-    font-size: 9px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: rgba(0,25,65,0.45);
-    font-weight: 500;
-  }
+.lc-left { flex: 1; min-width: 0; }
 
-  /* ── Limitations ── */
-  .limit-block {
-    margin-top: 32px;
-    border-top: 1px solid rgba(0,25,65,0.12);
-    padding-top: 24px;
-  }
+.lc-tag {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  color: #001941;
+}
+.tag-meth { background: rgba(217,130,66,0.18); }
+.tag-biol { background: rgba(24,112,253,0.12); }
+.tag-clin { background: rgba(136,135,128,0.15); }
+.tag-epis { background: rgba(211,74,74,0.12); }
 
-  .limit-label {
-    font-family: 'Playfair Display', serif;
-    font-size: 32px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    text-align: center;
-    color: #001941;
-    font-weight: 500;
-    margin-bottom: 20px;
-  }
+.lc-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #001941;
+  line-height: 1.35;
+  transition: color 0.15s;
+}
 
-  .limit-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
-  }
+.lc-chevron {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(0,25,65,0.05);
+  transition: background 0.15s;
+}
+.lc-chevron svg {
+  width: 12px; height: 12px;
+  stroke: rgba(0,25,65,0.40);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.22s ease;
+}
+.lc.open .lc-chevron { background: rgba(24,112,253,0.10); }
+.lc.open .lc-chevron svg { transform: rotate(180deg); stroke: #1870FD; }
 
-  .limit-card {
-    background: rgba(0,25,65,0.04);
-    border: 0.5px solid rgba(0,25,65,0.12);
-    border-radius: 12px;
-    padding: 14px 16px;
-  }
+.lc-body {
+  display: none;
+  padding: 0 4px 18px;
+  font-size: 13px;
+  color: rgba(0,25,65,0.65);
+  line-height: 1.6;
+}
+.lc.open .lc-body { display: block; }
 
-  .limit-card-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: #001941;
-    margin-bottom: 5px;
-    line-height: 1.3;
-  }
-
-  .limit-card-desc {
-    font-size: 13px;
-    color: rgba(0,25,65,0.65);
-    line-height: 1.5;
-  }
-
-  .limit-card-tag {
-    display: inline-block;
-    font-size: 9px;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    font-weight: 500;
-    padding: 2px 7px;
-    border-radius: 10px;
-    margin-bottom: 7px;
-    color: #001941;
-  }
-
-  .tag-meth { background: rgba(217,130,66,0.18); }
-  .tag-biol { background: rgba(24,112,253,0.12); }
-  .tag-clin { background: rgba(136,135,128,0.15); }
-  .tag-epis { background: rgba(211,74,74,0.12); }
-
-  /* ══════════════════════════════════════
-     RESPONSIVE
-  ══════════════════════════════════════ */
-  @media (max-width: 640px) {
-
-    body { padding: 24px 16px 48px; }
-
-    .section-label {
-      font-size: 22px;
-      letter-spacing: 1.5px;
-      margin-bottom: 20px;
-    }
-
-    .legend {
-      gap: 6px 12px;
-      margin-bottom: 28px;
-    }
-
-    .legend-item { font-size: 13px; }
-
-    /* Hide desktop table, show mobile cards */
-    .matrix { display: none; }
-    .mobile-cards { display: block; }
-
-    .limit-label {
-      font-size: 20px;
-      letter-spacing: 1.5px;
-    }
-
-    .limit-grid {
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-
-    .limit-card { padding: 12px 14px; }
-    .limit-card-title { font-size: 13px; }
-    .limit-card-desc { font-size: 12px; }
-  }
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  body { padding: 24px 16px 48px; }
+  .section-label { font-size: 22px; letter-spacing: 1.5px; margin-bottom: 20px; }
+  .limit-label { font-size: 20px; letter-spacing: 1.5px; }
+  .bar-label { width: 80px; }
+  .bar-tag { width: 64px; }
+  .ac-title { font-size: 14px; }
+}
 </style>
 </head>
 <body>
@@ -288,194 +292,261 @@
   <div class="section-label">Onde a Testagem Genética Ajuda</div>
 
   <div class="legend">
-    <div class="legend-item"><span class="legend-dot ld-green"></span>Ajuda muito</div>
-    <div class="legend-item"><span class="legend-dot ld-teal"></span>Ajuda um pouco</div>
-    <div class="legend-item"><span class="legend-dot ld-gray"></span>Indiferente</div>
-    <div class="legend-item"><span class="legend-dot ld-amber"></span>Faltam estudos</div>
+    <div class="legend-item"><span class="legend-dot ld-high"></span>Ajuda muito</div>
+    <div class="legend-item"><span class="legend-dot ld-mod"></span>Ajuda um pouco</div>
+    <div class="legend-item"><span class="legend-dot ld-neut"></span>Indiferente</div>
+    <div class="legend-item"><span class="legend-dot ld-unkn"></span>Faltam estudos</div>
   </div>
 
-  <!-- ── Desktop: tabela original ── -->
-  <table class="matrix">
-    <thead>
-      <tr>
-        <th class="col-q">Pergunta</th>
-        <th>Metabolismo<br>e dose</th>
-        <th>Efeitos<br>adversos</th>
-        <th>Eficácia<br>terapêutica</th>
-        <th>Diagnóstico</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="col-q">Por que doses padrão causam toxicidade em alguns?<div class="sub">Metabolizadores lentos de CYP450</div></td>
-        <td><span class="pill p-high"><span class="dot d-high"></span>Ajuda muito</span></td>
-        <td><span class="pill p-high"><span class="dot d-high"></span>Ajuda muito</span></td>
-        <td><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-      </tr>
-      <tr>
-        <td class="col-q">Por que um antidepressivo "não funciona" em alguns pacientes?<div class="sub">Metabolizadores ultrarrápidos eliminam o fármaco antes do efeito</div></td>
-        <td><span class="pill p-high"><span class="dot d-high"></span>Ajuda muito</span></td>
-        <td><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></td>
-        <td><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-      </tr>
-      <tr>
-        <td class="col-q">Reduzir tentativas e erros na escolha do medicamento<div class="sub">Principal argumento comercial da testagem</div></td>
-        <td><span class="pill p-high"><span class="dot d-high"></span>Ajuda muito</span></td>
-        <td><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></td>
-        <td><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-      </tr>
-      <tr>
-        <td class="col-q">Qual gene explica por que tenho depressão?<div class="sub">Causalidade gene → diagnóstico psiquiátrico</div></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-        <td><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></td>
-      </tr>
-      <tr>
-        <td class="col-q">Inflamação, microbioma e resposta ao tratamento<div class="sub">Mecanismos que o teste genético padrão não captura</div></td>
-        <td><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></td>
-        <td><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></td>
-        <td><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></td>
-        <td><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></td>
-      </tr>
-      <tr>
-        <td class="col-q">Heterogeneidade dentro de um mesmo diagnóstico<div class="sub">"Depressão" abriga fenótipos biologicamente distintos</div></td>
-        <td><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></td>
-        <td><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></td>
-        <td><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></td>
-        <td><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></td>
-      </tr>
-      <tr>
-        <td class="col-q">Garantir que o remédio certo vai curar o paciente<div class="sub">Expectativa comum — e incorreta</div></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-        <td><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- ── Cards ── -->
+  <div class="card-grid">
 
-  <!-- ── Mobile: cards empilhados ── -->
-  <div class="mobile-cards">
-
-    <div class="mc">
-      <div class="mc-question">Por que doses padrão causam toxicidade em alguns?</div>
-      <div class="mc-sub">Metabolizadores lentos de CYP450</div>
-      <div class="mc-pills">
-        <div class="mc-pill-wrap"><span class="mc-col-label">Metabolismo</span><span class="pill p-high"><span class="dot d-high"></span>Ajuda muito</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Ef. adversos</span><span class="pill p-high"><span class="dot d-high"></span>Ajuda muito</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Eficácia</span><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Diagnóstico</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
+    <div class="ac" data-bars='[["high","high","mod","neut"]]'>
+      <div class="ac-header" onclick="togAC(this)">
+        <div class="ac-left">
+          <div class="ac-title">Doses padrão causam toxicidade em metabolizadores lentos</div>
+          <div class="ac-sub">Variantes CYP450 reduzem a depuração do fármaco</div>
+          <div class="ac-insight"></div>
+        </div>
+        <div class="ac-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+      </div>
+      <div class="ac-body">
+        <div class="bar-row"><span class="bar-label">Metabolismo</span><div class="bar-track"><div class="bar-fill fill-high"></div></div><span class="bar-tag">Ajuda muito</span></div>
+        <div class="bar-row"><span class="bar-label">Ef. adversos</span><div class="bar-track"><div class="bar-fill fill-high"></div></div><span class="bar-tag">Ajuda muito</span></div>
+        <div class="bar-row"><span class="bar-label">Eficácia</span><div class="bar-track"><div class="bar-fill fill-mod"></div></div><span class="bar-tag">Um pouco</span></div>
+        <div class="bar-row"><span class="bar-label">Diagnóstico</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
       </div>
     </div>
 
-    <div class="mc">
-      <div class="mc-question">Por que um antidepressivo "não funciona" em alguns pacientes?</div>
-      <div class="mc-sub">Metabolizadores ultrarrápidos eliminam o fármaco antes do efeito</div>
-      <div class="mc-pills">
-        <div class="mc-pill-wrap"><span class="mc-col-label">Metabolismo</span><span class="pill p-high"><span class="dot d-high"></span>Ajuda muito</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Ef. adversos</span><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Eficácia</span><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Diagnóstico</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
+    <div class="ac" data-bars='[["high","mod","mod","neut"]]'>
+      <div class="ac-header" onclick="togAC(this)">
+        <div class="ac-left">
+          <div class="ac-title">Antidepressivos falham em metabolizadores ultrarrápidos</div>
+          <div class="ac-sub">O fármaco é eliminado antes de atingir concentração terapêutica</div>
+          <div class="ac-insight"></div>
+        </div>
+        <div class="ac-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+      </div>
+      <div class="ac-body">
+        <div class="bar-row"><span class="bar-label">Metabolismo</span><div class="bar-track"><div class="bar-fill fill-high"></div></div><span class="bar-tag">Ajuda muito</span></div>
+        <div class="bar-row"><span class="bar-label">Ef. adversos</span><div class="bar-track"><div class="bar-fill fill-mod"></div></div><span class="bar-tag">Um pouco</span></div>
+        <div class="bar-row"><span class="bar-label">Eficácia</span><div class="bar-track"><div class="bar-fill fill-mod"></div></div><span class="bar-tag">Um pouco</span></div>
+        <div class="bar-row"><span class="bar-label">Diagnóstico</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
       </div>
     </div>
 
-    <div class="mc">
-      <div class="mc-question">Reduzir tentativas e erros na escolha do medicamento</div>
-      <div class="mc-sub">Principal argumento comercial da testagem</div>
-      <div class="mc-pills">
-        <div class="mc-pill-wrap"><span class="mc-col-label">Metabolismo</span><span class="pill p-high"><span class="dot d-high"></span>Ajuda muito</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Ef. adversos</span><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Eficácia</span><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Diagnóstico</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
+    <div class="ac" data-bars='[["high","mod","mod","neut"]]'>
+      <div class="ac-header" onclick="togAC(this)">
+        <div class="ac-left">
+          <div class="ac-title">Reduzir tentativas e erros na escolha do medicamento</div>
+          <div class="ac-sub">Principal argumento comercial da testagem</div>
+          <div class="ac-insight"></div>
+        </div>
+        <div class="ac-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+      </div>
+      <div class="ac-body">
+        <div class="bar-row"><span class="bar-label">Metabolismo</span><div class="bar-track"><div class="bar-fill fill-high"></div></div><span class="bar-tag">Ajuda muito</span></div>
+        <div class="bar-row"><span class="bar-label">Ef. adversos</span><div class="bar-track"><div class="bar-fill fill-mod"></div></div><span class="bar-tag">Um pouco</span></div>
+        <div class="bar-row"><span class="bar-label">Eficácia</span><div class="bar-track"><div class="bar-fill fill-mod"></div></div><span class="bar-tag">Um pouco</span></div>
+        <div class="bar-row"><span class="bar-label">Diagnóstico</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
       </div>
     </div>
 
-    <div class="mc">
-      <div class="mc-question">Qual gene explica por que tenho depressão?</div>
-      <div class="mc-sub">Causalidade gene → diagnóstico psiquiátrico</div>
-      <div class="mc-pills">
-        <div class="mc-pill-wrap"><span class="mc-col-label">Metabolismo</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Ef. adversos</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Eficácia</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Diagnóstico</span><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></div>
+    <div class="ac" data-bars='[["neut","neut","neut","unkn"]]'>
+      <div class="ac-header" onclick="togAC(this)">
+        <div class="ac-left">
+          <div class="ac-title">Identificar qual gene explica o diagnóstico de depressão</div>
+          <div class="ac-sub">Causalidade gene → diagnóstico psiquiátrico</div>
+          <div class="ac-insight"></div>
+        </div>
+        <div class="ac-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+      </div>
+      <div class="ac-body">
+        <div class="bar-row"><span class="bar-label">Metabolismo</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
+        <div class="bar-row"><span class="bar-label">Ef. adversos</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
+        <div class="bar-row"><span class="bar-label">Eficácia</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
+        <div class="bar-row"><span class="bar-label">Diagnóstico</span><div class="bar-track"><div class="bar-fill fill-unkn"></div></div><span class="bar-tag">Faltam estudos</span></div>
       </div>
     </div>
 
-    <div class="mc">
-      <div class="mc-question">Inflamação, microbioma e resposta ao tratamento</div>
-      <div class="mc-sub">Mecanismos que o teste genético padrão não captura</div>
-      <div class="mc-pills">
-        <div class="mc-pill-wrap"><span class="mc-col-label">Metabolismo</span><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Ef. adversos</span><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Eficácia</span><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Diagnóstico</span><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></div>
+    <div class="ac" data-bars='[["unkn","unkn","unkn","unkn"]]'>
+      <div class="ac-header" onclick="togAC(this)">
+        <div class="ac-left">
+          <div class="ac-title">Inflamação, microbioma e resposta ao tratamento</div>
+          <div class="ac-sub">Mecanismos que o teste genético padrão não captura</div>
+          <div class="ac-insight"></div>
+        </div>
+        <div class="ac-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+      </div>
+      <div class="ac-body">
+        <div class="bar-row"><span class="bar-label">Metabolismo</span><div class="bar-track"><div class="bar-fill fill-unkn"></div></div><span class="bar-tag">Faltam estudos</span></div>
+        <div class="bar-row"><span class="bar-label">Ef. adversos</span><div class="bar-track"><div class="bar-fill fill-unkn"></div></div><span class="bar-tag">Faltam estudos</span></div>
+        <div class="bar-row"><span class="bar-label">Eficácia</span><div class="bar-track"><div class="bar-fill fill-unkn"></div></div><span class="bar-tag">Faltam estudos</span></div>
+        <div class="bar-row"><span class="bar-label">Diagnóstico</span><div class="bar-track"><div class="bar-fill fill-unkn"></div></div><span class="bar-tag">Faltam estudos</span></div>
       </div>
     </div>
 
-    <div class="mc">
-      <div class="mc-question">Heterogeneidade dentro de um mesmo diagnóstico</div>
-      <div class="mc-sub">"Depressão" abriga fenótipos biologicamente distintos</div>
-      <div class="mc-pills">
-        <div class="mc-pill-wrap"><span class="mc-col-label">Metabolismo</span><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Ef. adversos</span><span class="pill p-mod"><span class="dot d-mod"></span>Um pouco</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Eficácia</span><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Diagnóstico</span><span class="pill p-unkn"><span class="dot d-unkn"></span>Faltam estudos</span></div>
+    <div class="ac" data-bars='[["mod","mod","unkn","unkn"]]'>
+      <div class="ac-header" onclick="togAC(this)">
+        <div class="ac-left">
+          <div class="ac-title">Heterogeneidade dentro de um mesmo diagnóstico</div>
+          <div class="ac-sub">"Depressão" abriga fenótipos biologicamente distintos</div>
+          <div class="ac-insight"></div>
+        </div>
+        <div class="ac-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+      </div>
+      <div class="ac-body">
+        <div class="bar-row"><span class="bar-label">Metabolismo</span><div class="bar-track"><div class="bar-fill fill-mod"></div></div><span class="bar-tag">Um pouco</span></div>
+        <div class="bar-row"><span class="bar-label">Ef. adversos</span><div class="bar-track"><div class="bar-fill fill-mod"></div></div><span class="bar-tag">Um pouco</span></div>
+        <div class="bar-row"><span class="bar-label">Eficácia</span><div class="bar-track"><div class="bar-fill fill-unkn"></div></div><span class="bar-tag">Faltam estudos</span></div>
+        <div class="bar-row"><span class="bar-label">Diagnóstico</span><div class="bar-track"><div class="bar-fill fill-unkn"></div></div><span class="bar-tag">Faltam estudos</span></div>
       </div>
     </div>
 
-    <div class="mc">
-      <div class="mc-question">Garantir que o remédio certo vai curar o paciente</div>
-      <div class="mc-sub">Expectativa comum — e incorreta</div>
-      <div class="mc-pills">
-        <div class="mc-pill-wrap"><span class="mc-col-label">Metabolismo</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Ef. adversos</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Eficácia</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
-        <div class="mc-pill-wrap"><span class="mc-col-label">Diagnóstico</span><span class="pill p-neut"><span class="dot d-neut"></span>Indiferente</span></div>
+    <div class="ac" data-bars='[["neut","neut","neut","neut"]]'>
+      <div class="ac-header" onclick="togAC(this)">
+        <div class="ac-left">
+          <div class="ac-title">Garantir que o medicamento certo vai curar o paciente</div>
+          <div class="ac-sub">Expectativa comum — e incorreta</div>
+          <div class="ac-insight"></div>
+        </div>
+        <div class="ac-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+      </div>
+      <div class="ac-body">
+        <div class="bar-row"><span class="bar-label">Metabolismo</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
+        <div class="bar-row"><span class="bar-label">Ef. adversos</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
+        <div class="bar-row"><span class="bar-label">Eficácia</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
+        <div class="bar-row"><span class="bar-label">Diagnóstico</span><div class="bar-track"><div class="bar-fill fill-neut"></div></div><span class="bar-tag">Indiferente</span></div>
       </div>
     </div>
 
-  </div><!-- /mobile-cards -->
+  </div><!-- /card-grid -->
 
+  <!-- ── Limitações ── -->
   <div class="limit-block">
     <div class="limit-label">Limitações que o teste não resolve</div>
-    <div class="limit-grid">
-      <div class="limit-card">
-        <div class="limit-card-tag tag-meth">Metodológica</div>
-        <div class="limit-card-title">Não é diagnóstico</div>
-        <div class="limit-card-desc">O teste mapeia metabolismo enzimático, não etiologia. Nenhuma variante genética conhecida define ou confirma um diagnóstico psiquiátrico.</div>
+
+    <div class="card-grid">
+
+      <div class="lc">
+        <div class="lc-header" onclick="togLC(this)">
+          <div class="lc-left">
+            <div class="lc-tag tag-meth">Metodológica</div>
+            <div class="lc-title">Não é diagnóstico</div>
+          </div>
+          <div class="lc-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+        </div>
+        <div class="lc-body">O teste mapeia metabolismo enzimático, não etiologia. Nenhuma variante genética conhecida define ou confirma um diagnóstico psiquiátrico.</div>
       </div>
-      <div class="limit-card">
-        <div class="limit-card-tag tag-biol">Biológica</div>
-        <div class="limit-card-title">Causalidade genética incompleta</div>
-        <div class="limit-card-desc">A arquitetura genética de transtornos mentais é poligênica e de efeito pequeno. Não existe "gene da depressão" com valor preditivo individual robusto.</div>
+
+      <div class="lc">
+        <div class="lc-header" onclick="togLC(this)">
+          <div class="lc-left">
+            <div class="lc-tag tag-biol">Biológica</div>
+            <div class="lc-title">Causalidade genética incompleta</div>
+          </div>
+          <div class="lc-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+        </div>
+        <div class="lc-body">A arquitetura genética de transtornos mentais é poligênica e de efeito pequeno. Não existe "gene da depressão" com valor preditivo individual robusto.</div>
       </div>
-      <div class="limit-card">
-        <div class="limit-card-tag tag-biol">Biológica</div>
-        <div class="limit-card-title">Inflamação e microbioma</div>
-        <div class="limit-card-desc">Vias inflamatórias e o eixo intestino-cérebro influenciam resposta a psicofármacos — e não são capturadas por testes de farmacogenética convencional.</div>
+
+      <div class="lc">
+        <div class="lc-header" onclick="togLC(this)">
+          <div class="lc-left">
+            <div class="lc-tag tag-biol">Biológica</div>
+            <div class="lc-title">Inflamação e microbioma</div>
+          </div>
+          <div class="lc-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+        </div>
+        <div class="lc-body">Vias inflamatórias e o eixo intestino-cérebro influenciam resposta a psicofármacos — e não são capturadas por testes de farmacogenética convencional.</div>
       </div>
-      <div class="limit-card">
-        <div class="limit-card-tag tag-epis">Epistêmica</div>
-        <div class="limit-card-title">Heterogeneidade diagnóstica</div>
-        <div class="limit-card-desc">Um mesmo diagnóstico categorial agrupa fenótipos biologicamente distintos. A testagem genética não resolve essa heterogeneidade — ainda.</div>
+
+      <div class="lc">
+        <div class="lc-header" onclick="togLC(this)">
+          <div class="lc-left">
+            <div class="lc-tag tag-epis">Epistêmica</div>
+            <div class="lc-title">Heterogeneidade diagnóstica</div>
+          </div>
+          <div class="lc-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+        </div>
+        <div class="lc-body">Um mesmo diagnóstico categorial agrupa fenótipos biologicamente distintos. A testagem genética não resolve essa heterogeneidade — ainda.</div>
       </div>
-      <div class="limit-card">
-        <div class="limit-card-tag tag-clin">Clínica</div>
-        <div class="limit-card-title">Evidências de efetividade limitadas</div>
-        <div class="limit-card-desc">Ensaios clínicos randomizados sobre desfechos de saúde orientados por farmacogenética ainda são escassos. Promessa clínica não é o mesmo que efetividade comprovada.</div>
+
+      <div class="lc">
+        <div class="lc-header" onclick="togLC(this)">
+          <div class="lc-left">
+            <div class="lc-tag tag-clin">Clínica</div>
+            <div class="lc-title">Evidências de efetividade limitadas</div>
+          </div>
+          <div class="lc-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+        </div>
+        <div class="lc-body">Ensaios clínicos randomizados sobre desfechos de saúde orientados por farmacogenética ainda são escassos. Promessa clínica não é o mesmo que efetividade comprovada.</div>
       </div>
-      <div class="limit-card">
-        <div class="limit-card-tag tag-clin">Clínica</div>
-        <div class="limit-card-title">Não substitui o processo clínico</div>
-        <div class="limit-card-desc">Psicodinâmica, expectativas, adesão e suporte psicossocial explicam mais desfechos do que qualquer variante enzimática isolada.</div>
+
+      <div class="lc">
+        <div class="lc-header" onclick="togLC(this)">
+          <div class="lc-left">
+            <div class="lc-tag tag-clin">Clínica</div>
+            <div class="lc-title">Não substitui o processo clínico</div>
+          </div>
+          <div class="lc-chevron"><svg viewBox="0 0 12 12" fill="none"><polyline points="1,3 6,9 11,3"/></svg></div>
+        </div>
+        <div class="lc-body">Psicodinâmica, expectativas, adesão e suporte psicossocial explicam mais desfechos do que qualquer variante enzimática isolada.</div>
       </div>
+
     </div>
   </div>
 
 </div>
+
+<script>
+// ── Insight generator ──────────────────────────
+const DIMS = ['metabolismo', 'efeitos adversos', 'eficácia', 'diagnóstico'];
+
+function buildInsight(levels) {
+  const high  = levels.map((l,i) => l==='high'  ? DIMS[i] : null).filter(Boolean);
+  const mod   = levels.map((l,i) => l==='mod'   ? DIMS[i] : null).filter(Boolean);
+  const unkn  = levels.map((l,i) => l==='unkn'  ? DIMS[i] : null).filter(Boolean);
+  const allNeut = levels.every(l => l === 'neut');
+  const allUnkn = levels.every(l => l === 'unkn');
+
+  if (allNeut) return 'Sem utilidade conhecida em nenhuma das dimensões avaliadas';
+  if (allUnkn) return 'Evidências insuficientes em todas as dimensões';
+  if (high.length > 0) {
+    const rest = mod.length > 0 ? `; utilidade parcial em ${mod.join(' e ')}` : '';
+    return `Evidência robusta em ${high.join(' e ')}${rest}`;
+  }
+  if (mod.length > 0 && unkn.length > 0) {
+    return `Utilidade parcial em ${mod.join(' e ')}; evidências em aberto para ${unkn.join(' e ')}`;
+  }
+  if (mod.length > 0) {
+    return `Utilidade parcial em ${mod.join(' e ')}`;
+  }
+  return 'Resultado misto — expandir para detalhes';
+}
+
+// Populate insights on load
+document.querySelectorAll('.ac').forEach(card => {
+  const raw    = card.getAttribute('data-bars');
+  const levels = JSON.parse(raw)[0];
+  const el     = card.querySelector('.ac-insight');
+  if (el) el.textContent = buildInsight(levels);
+});
+
+// ── Accordion toggles ─────────────────────────
+function togAC(header) {
+  const card   = header.closest('.ac');
+  const isOpen = card.classList.contains('open');
+  document.querySelectorAll('.ac.open').forEach(c => c.classList.remove('open'));
+  if (!isOpen) card.classList.add('open');
+}
+
+function togLC(header) {
+  const card   = header.closest('.lc');
+  const isOpen = card.classList.contains('open');
+  document.querySelectorAll('.lc.open').forEach(c => c.classList.remove('open'));
+  if (!isOpen) card.classList.add('open');
+}
+</script>
 </body>
 </html>
