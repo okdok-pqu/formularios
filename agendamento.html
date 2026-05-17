@@ -685,8 +685,16 @@ function updAcc() {
   if (c) acceptTS = new Date().toISOString();
 }
 
+// ════════════════════════════════════════════════
+// buildPDFDoc — VERSÃO v7 INTEGRAL
+// Gera PDF com texto completo do Contrato Terapêutico v7
+// + bloco de aceite digital com dados do paciente no topo
+// ════════════════════════════════════════════════
 function buildPDFDoc() {
-  const { jsPDF } = window.jspdf, doc = new jsPDF();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+  // ── Dados do paciente ──
   const nome  = document.getElementById('p_nome').value.trim();
   const nasc  = document.getElementById('p_nasc').value;
   const cpf   = document.getElementById('p_cpf').value.trim();
@@ -695,72 +703,276 @@ function buildPDFDoc() {
   const hoje  = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   const nascFmt = nasc ? new Date(nasc + 'T00:00:00').toLocaleDateString('pt-BR') : '';
 
-  const rows = [
-    { b: true, sz: 12, t: 'CONTRATO TERAPÊUTICO' },
-    { t: 'Dr. Albert Felipe Mojzeszowicz — CRM-SP 175671' },
-    { t: '' },
-    { b: true, t: 'ACEITE DIGITAL' },
-    { t: `Aceito por: ${nome}` },
-    { t: `CPF: ${cpf}` },
-    { t: `Timestamp: ${new Date(acceptTS).toLocaleString('pt-BR')}` },
-    { t: '' },
-    { b: true, t: 'IDENTIFICAÇÃO DO PACIENTE' },
-    { t: `Nome:         ${nome}` },
-    { t: `Nascimento:   ${nascFmt}` },
-    { t: `CPF:          ${cpf}` },
-    { t: `Telefone:     ${tel.trim()}` },
-    { t: `E-mail:       ${email}` },
-    { t: '' },
-    { t: '─────────────────────────────────────────────' },
-    { t: '' },
-    { b: true, t: 'CONDIÇÕES DO ATENDIMENTO' },
-    { t: '' },
-    { b: true, t: '1. Obrigações do Médico' },
-    { t: '• Conduzir consultas com base no conhecimento científico e na Declaração de Genebra.' },
-    { t: '• Manter sigilo das informações clínicas e pessoais, mesmo após a morte do paciente.' },
-    { t: '• Comunicar diagnósticos de forma acessível e responder dúvidas.' },
-    { t: '• Prescrever medicamentos com base em critérios clínicos.' },
-    { t: '• Comunicar cancelamentos com 24h de antecedência.' },
-    { t: '• Responder mensagens fora do horário em até 24–48h úteis.' },
-    { t: '• Fornecer resumo clínico ou prontuário a qualquer momento.' },
-    { t: '' },
-    { b: true, t: '2. Responsabilidades do Paciente' },
-    { t: '• Cancelar consultas com 1 dia de antecedência.' },
-    { t: '• Colher exames solicitados antes da próxima consulta.' },
-    { t: '• Comunicar desejo de alterar prescrição antes de fazê-lo.' },
-    { t: '• Utilizar medicamentos conforme orientado.' },
-    { t: '' },
-    { b: true, t: '3. Honorários e Cancelamentos' },
-    { t: '• 1 dia ou mais de antecedência: sem cobrança.' },
-    { t: '• No dia ou sem aviso: 50% do valor da consulta.' },
-    { t: '' },
-    { b: true, t: '4. Comunicação' },
-    { t: 'WhatsApp em horário comercial. Agendamentos: Ingrid (11) 97105-7112.' },
-    { t: '' },
-    { b: true, t: '5. Plano de Segurança' },
-    { t: 'Crise aguda: SAMU (192) ou CVV (188).' },
-    { t: '' },
-    { b: true, t: '6. Telepsiquiatria' },
-    { t: 'Consultas por vídeo seguem as mesmas condições.' },
-    { t: '' },
-    { t: '─────────────────────────────────────────────' },
-    { t: '' },
-    { t: `Local e data: _________________________, ${hoje}` },
-    { t: '' },
-    { t: '' },
-    { t: '_______________________________          _______________________________' },
-    { t: `Dr. Albert Felipe Mojzeszowicz           ${nome}` },
-    { t: 'CRM-SP 175671                            Paciente (aceite digital)' },
-  ];
+  // ── Layout constants (mm, A4 = 210 × 297) ──
+  const ML = 20, MR = 20, MT = 18, MB = 20;
+  const PW = 210, PH = 297;
+  const CW = PW - ML - MR;
+  const NAVY = [0, 25, 65]; // #001941 — cor dos títulos
+  let y = MT;
 
-  let y = 18;
-  rows.forEach(({ t, b, sz }) => {
-    if (y > 272) { doc.addPage(); y = 18; }
-    doc.setFont('helvetica', b ? 'bold' : 'normal');
-    doc.setFontSize(sz || 9.5);
-    doc.text(t, 18, y);
-    y += (t === '' ? 4 : 6);
-  });
+  // ── Helpers ──
+  const space = (n) => { y += n; };
+  const newPageIfNeeded = (need) => {
+    if (y + need > PH - MB) { doc.addPage(); y = MT; }
+  };
+  const writeParagraph = (text, opts = {}) => {
+    const { bold = false, size = 10, italic = false, indent = 0, leading = 5, justify = true } = opts;
+    const style = bold ? (italic ? 'bolditalic' : 'bold') : (italic ? 'italic' : 'normal');
+    doc.setFont('helvetica', style);
+    doc.setFontSize(size);
+    const lines = doc.splitTextToSize(text, CW - indent);
+    lines.forEach(line => {
+      newPageIfNeeded(leading);
+      doc.text(line, ML + indent, y);
+      y += leading;
+    });
+  };
+  const writeBullet = (text, opts = {}) => {
+    const { size = 10, leading = 5 } = opts;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(size);
+    const bulletX = ML + 2;
+    const textX = ML + 7;
+    const lines = doc.splitTextToSize(text, CW - 7);
+    lines.forEach((line, i) => {
+      newPageIfNeeded(leading);
+      if (i === 0) doc.text('•', bulletX, y);
+      doc.text(line, textX, y);
+      y += leading;
+    });
+  };
+  const writeHeading = (text, opts = {}) => {
+    const { size = 12, before = 4, after = 2 } = opts;
+    space(before);
+    newPageIfNeeded(size * 0.5 + after + 2);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(size);
+    doc.setTextColor(...NAVY);
+    doc.text(text, ML, y);
+    doc.setTextColor(0, 0, 0);
+    y += size * 0.45 + after;
+  };
+  const writeRule = () => {
+    newPageIfNeeded(4);
+    doc.setDrawColor(180);
+    doc.setLineWidth(0.2);
+    doc.line(ML, y, PW - MR, y);
+    y += 4;
+  };
+
+  // ═══════════════ CABEÇALHO ═══════════════
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(...NAVY);
+  doc.text('Dr. Albert Felipe Mojzeszowicz  |  Psiquiatria', ML, y);
+  doc.setTextColor(0, 0, 0);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('CRM-SP 175671  |  RQE 87037', ML, y);
+  y += 7;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.setTextColor(...NAVY);
+  doc.text('CONTRATO TERAPÊUTICO', ML, y);
+  doc.setTextColor(0, 0, 0);
+  y += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text('Consulta Psiquiátrica Particular', ML, y);
+  y += 4.5;
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(9);
+  doc.text('Condições do atendimento  |  Direitos e responsabilidades', ML, y);
+  y += 6;
+
+  writeRule();
+
+  // ═══════════════ BLOCO DE ACEITE ═══════════════
+  writeHeading('ACEITE DIGITAL', { size: 10, before: 0, after: 1 });
+  writeParagraph(`Aceito por: ${nome}`, { size: 9, leading: 4.2 });
+  writeParagraph(`CPF: ${cpf}`, { size: 9, leading: 4.2 });
+  writeParagraph(`Timestamp: ${acceptTS ? new Date(acceptTS).toLocaleString('pt-BR') : '—'}`, { size: 9, leading: 4.2 });
+  space(2);
+
+  writeHeading('IDENTIFICAÇÃO DO PACIENTE', { size: 10, before: 1, after: 1 });
+  writeParagraph(`Nome: ${nome}`, { size: 9, leading: 4.2 });
+  writeParagraph(`Nascimento: ${nascFmt}`, { size: 9, leading: 4.2 });
+  writeParagraph(`CPF: ${cpf}`, { size: 9, leading: 4.2 });
+  writeParagraph(`Telefone: ${tel.trim()}`, { size: 9, leading: 4.2 });
+  writeParagraph(`E-mail: ${email}`, { size: 9, leading: 4.2 });
+  space(2);
+  writeRule();
+
+  // ═══════════════ PREÂMBULO ═══════════════
+  writeParagraph(
+    'Este documento serve para tornar o tratamento previsível para os dois lados: ' +
+    'o paciente sabe o que pode esperar; o médico pode trabalhar com organização e dedicação.'
+  );
+  space(2);
+  writeParagraph(
+    'Uma relação entre médico e paciente que não contenha confiança e transparência nunca será terapêutica. ' +
+    'As regras aqui propostas existem para proteger a qualidade do cuidado e o melhor resultado possível para cada paciente. ' +
+    'Elas se baseiam no pressuposto de boa-fé entre as partes e na natureza da relação médico-paciente pautada por humanidade e confiança — ' +
+    'e é por isso que este documento fala como médico, não como jurista.'
+  );
+
+  // ═══════════════ 1. OBRIGAÇÕES DO MÉDICO ═══════════════
+  writeHeading('1. Obrigações do Médico');
+
+  writeHeading('1.1  Cuidado e ética', { size: 10, before: 1, after: 1 });
+  writeBullet('Conduzir as consultas com base no conhecimento científico e nos princípios da Declaração de Genebra, adotada pela Associação Médica Mundial.');
+  writeBullet('Manter sigilo sobre todas as informações clínicas e pessoais do paciente, mesmo após sua morte.');
+  writeBullet('Comunicar diagnósticos e responder dúvidas de forma acessível ao paciente.');
+  writeBullet('Prescrever medicamentos com base em critérios clínicos, informando benefícios e riscos relevantes.');
+  writeBullet('Contatar outros serviços ou especialistas sempre que necessário.');
+  writeBullet('Em situação de risco imediato, garantir encaminhamento antes de encerrar o atendimento.');
+
+  writeHeading('1.2  Organização e comunicação', { size: 10, before: 2, after: 1 });
+  writeBullet('Manter agenda com regularidade e comunicar cancelamentos com 24 horas de antecedência, salvo motivo de força maior.');
+  writeBullet('Responder mensagens fora do horário de consulta em até 24–48 horas úteis, exceto em urgências e emergências.');
+  writeBullet('Emitir atestados, laudos e receituários com base em avaliação clínica.');
+  writeBullet('Fornecer resumo clínico ou cópia do prontuário a qualquer momento — entre consultas ou após o fim do seguimento —, seja para o paciente exercer o direito a uma segunda opinião, seja por outro motivo.');
+
+  writeHeading('1.3  Encerramento do acompanhamento', { size: 10, before: 2, after: 1 });
+  writeBullet('O médico pode encerrar o acompanhamento em casos de incompatibilidade relacional ou razões pessoais, com comunicação com 30 dias de antecedência.');
+  writeBullet('Fornecerá resumo clínico e indicará outro profissional para continuidade do tratamento.');
+  writeBullet('Garantirá atendimento de urgência ou encaminhamento durante a transição.');
+
+  // ═══════════════ 2. RESPONSABILIDADES DO PACIENTE ═══════════════
+  writeHeading('2. Responsabilidades do Paciente', { before: 4 });
+
+  writeHeading('2.1  Participação no tratamento', { size: 10, before: 1, after: 1 });
+  writeBullet('Comparecer às consultas agendadas ou cancelar com pelo menos 1 dia de antecedência.');
+  writeBullet('Colher os exames solicitados e encaminhar o resultado ao médico antes da próxima consulta.');
+  writeBullet('Responder às perguntas do médico do modo mais completo possível. Caso uma informação não esteja disponível, comunicar a impossibilidade.');
+  writeBullet('Comunicar por WhatsApp o desejo de interromper ou alterar qualquer item da prescrição ou medida não farmacológica (p. ex., psicoterapia) antes de fazê-lo.');
+
+  writeHeading('2.2  Uso de medicamentos e terapias não farmacológicas', { size: 10, before: 2, after: 1 });
+  writeBullet('Utilizar os medicamentos conforme orientado e esclarecer dúvidas por WhatsApp diretamente com o médico.');
+  writeBullet('Discutir na consulta preferências ou resistências em relação à prescrição ou à interrupção de qualquer substância, incluindo fitoterápicos e medicações de outras especialidades.');
+  writeBullet('Comunicar ao médico alterações na prescrição recomendadas por outros profissionais.');
+
+  // ═══════════════ 3. CADA ATENDIMENTO INCLUI ═══════════════
+  writeHeading('3. Cada Atendimento Inclui', { before: 4 });
+  writeParagraph('Entrevista estruturada com exame do estado mental e seu registro no prontuário em linguagem clara e sem abreviaturas.');
+  space(2);
+  writeParagraph('Ao término, o médico apresentará a impressão diagnóstica e a conduta terapêutica, com ou sem alteração no regime medicamentoso vigente.');
+
+  // ═══════════════ 4. HONORÁRIOS E CANCELAMENTOS ═══════════════
+  writeHeading('4. Honorários e Cancelamentos', { before: 4 });
+  writeParagraph('Presume-se a boa-fé e a intenção de honrar o compromisso firmado.');
+  space(2);
+  writeParagraph('Cancelamentos:', { bold: true });
+  writeBullet('Com 1 dia ou mais de antecedência: sem cobrança.');
+  writeBullet('Com menos de 12 horas de antecedência: cobrança de 30% do valor da consulta.');
+  writeBullet('Sem aviso (não comparecimento): cobrança do valor integral da consulta.');
+  writeBullet('Cancelamentos do médico: sem ônus ao paciente, com reagendamento prioritário.');
+
+  // ═══════════════ 5. COMUNICAÇÃO FORA DA CONSULTA ═══════════════
+  writeHeading('5. Comunicação Fora da Consulta', { before: 4 });
+
+  writeHeading('5.1  Canal e horário', { size: 10, before: 1, after: 1 });
+  writeBullet('O contato fora da consulta deverá ser feito por WhatsApp, de preferência no horário comercial, por texto ou áudio.');
+  writeBullet('Destina-se a dúvidas sobre medicação já prescrita (dose, horário, modo de tomada) e à comunicação de efeitos adversos.');
+  writeBullet('Agendamentos e questões administrativas devem ser tratados diretamente com a secretária, senhora Ingrid: (11) 97105-7112.');
+  writeBullet('Mensagens fora do horário serão respondidas de acordo com a gravidade, o mais rápido possível.');
+
+  writeHeading('5.2  Limites do canal', { size: 10, before: 2, after: 1 });
+  writeBullet('Sessões de suporte emocional ou psicoterapia não são adequadas para esse canal.');
+  writeBullet('Avaliações diagnósticas e início de novos medicamentos requerem consulta.');
+
+  // ═══════════════ 6. PLANO DE SEGURANÇA ═══════════════
+  writeHeading('6. Plano de Segurança', { before: 4 });
+  writeParagraph(
+    'Situações de crise grave, comportamento de risco, intenção suicida ou de autolesão devem ser comunicadas ao médico, ao psicólogo e ao contato de emergência. ' +
+    'Em crise aguda com risco imediato, o paciente ou responsável aciona o SAMU (192) ou o CVV (188) e, se necessário, dirige-se ao Pronto-Socorro sem aguardar retorno do médico.'
+  );
+  space(2);
+  writeParagraph(
+    'O médico pode solicitar, a critério clínico, que um familiar ou pessoa de confiança esteja ciente do tratamento. ' +
+    'O plano de segurança será revisado ao longo do acompanhamento conforme a evolução clínica.'
+  );
+
+  // ═══════════════ 7. PRIVACIDADE E DADOS ═══════════════
+  writeHeading('7. Privacidade e Dados', { before: 4 });
+  writeParagraph(
+    'As informações clínicas e pessoais do paciente são tratadas com base na Lei Geral de Proteção de Dados (Lei 13.709/2018 — LGPD). ' +
+    'O dado genético, quando gerado por testagem farmacogenética, é classificado como dado sensível pela LGPD e recebe proteção reforçada.'
+  );
+  space(2);
+  writeParagraph(
+    'Os registros serão mantidos em sistema seguro, com acesso restrito, pelo prazo mínimo de 20 anos determinado pelo CFM (Resolução 1821/2007). ' +
+    'Dados não serão compartilhados com terceiros sem autorização expressa do paciente, salvo risco à vida, segurança pública ou obrigação legal de notificação compulsória.'
+  );
+
+  // ═══════════════ 8. TECNOLOGIA E IA ═══════════════
+  writeHeading('8. Uso de Tecnologia e Inteligência Artificial', { before: 4 });
+  writeParagraph(
+    'O acompanhamento pode incluir o uso de ferramentas digitais e, eventualmente, de inteligência artificial (IA) como apoio ao raciocínio clínico. ' +
+    'Qualquer ferramenta de IA utilizada opera como suporte à decisão do médico — nunca como substituta do julgamento clínico ou da relação terapêutica.'
+  );
+  space(2);
+  writeParagraph(
+    'Em consonância com as diretrizes da Organização Mundial da Saúde (OMS) sobre ética e governança da IA em saúde, são princípios que norteiam esse uso: ' +
+    'proteção da autonomia do paciente; transparência sobre o papel da IA no processo; responsabilidade médica integral pela decisão final; ' +
+    'e vedação ao uso de dados do paciente para treino de algoritmos sem consentimento específico.'
+  );
+
+  // ═══════════════ 9. TELEPSIQUIATRIA ═══════════════
+  writeHeading('9. Telepsiquiatria', { before: 4 });
+  writeParagraph(
+    'Consultas por videoconferência seguem as mesmas condições deste acordo. O paciente deve garantir ambiente reservado e conexão estável. ' +
+    'A videoconsulta não substitui o atendimento presencial quando o médico avaliar que a avaliação clínica exige contato direto.'
+  );
+
+  // ═══════════════ 10. ENCERRAMENTO ═══════════════
+  writeHeading('10. Encerramento do Acompanhamento', { before: 4 });
+  writeParagraph(
+    'O acompanhamento pode ser encerrado por iniciativa do paciente, a qualquer momento — comunicação prévia é bem-vinda para planejar a alta ou o encaminhamento; ' +
+    'por iniciativa do médico, nas condições descritas na seção 1.3; ou por alta terapêutica, quando os objetivos do tratamento forem atingidos.'
+  );
+  space(2);
+  writeParagraph('Em qualquer situação, o médico fornecerá resumo clínico e indicará continuidade do cuidado.');
+
+  // ═══════════════ 11. VIGÊNCIA ═══════════════
+  writeHeading('11. Vigência e Revisão', { before: 4 });
+  writeParagraph(
+    'Este acordo tem validade por prazo indeterminado a partir da assinatura e pode ser revisado por iniciativa de qualquer das partes. ' +
+    'A versão vigente estará sempre disponível no site do médico para consulta.'
+  );
+
+  // ═══════════════ 12. ASSINATURA ═══════════════
+  writeHeading('12. Identificação e Assinatura', { before: 4 });
+  space(2);
+  writeParagraph(`Local e data: ____________________________________, ${hoje}`, { size: 9.5 });
+  space(10);
+  newPageIfNeeded(22);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setDrawColor(80);
+  doc.line(ML, y, ML + 75, y);
+  doc.line(PW - MR - 75, y, PW - MR, y);
+  y += 4;
+  doc.text('Dr. Albert Felipe Mojzeszowicz', ML, y);
+  doc.text(nome || 'Paciente', PW - MR - 75, y);
+  y += 4;
+  doc.setFontSize(8);
+  doc.text('CRM-SP 175671  |  RQE 87037', ML, y);
+  doc.text('Paciente (aceite digital)', PW - MR - 75, y);
+
+  // ═══════════════ RODAPÉ ═══════════════
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(7.5);
+    doc.setTextColor(120);
+    doc.text(`Contrato Terapêutico  |  v7  |  Página ${i} de ${pageCount}`, PW / 2, PH - 8, { align: 'center' });
+    doc.setTextColor(0);
+  }
+
   return doc;
 }
 
@@ -920,7 +1132,7 @@ ${obs ? 'OBSERVAÇÕES\n\n' + obs + '\n' : ''}
 CONTRATO TERAPÊUTICO
 
 Aceito digitalmente em: ${new Date(acceptTS).toLocaleString('pt-BR')}
-PDF do contrato em anexo.
+PDF do contrato em anexo (versão v7 — texto integral).
 
 ════════════════════════════════════
 Enviado em: ${ts}`;
