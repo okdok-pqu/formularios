@@ -1235,17 +1235,22 @@ PDF do contrato em anexo (versão v7 — texto integral).
 ════════════════════════════════════
 Enviado em: ${ts}`;
 
+  // Gera o PDF uma única vez, reusa nos dois envios
   let pdf = '';
-  try { pdf = buildPDFDoc().output('datauristring').split(',')[1]; } catch (e) {}
+  try { pdf = buildPDFDoc().output('datauristring').split(',')[1]; } catch (e) {
+    console.error('Falha ao gerar PDF:', e);
+  }
 
+  // Email 1 → para o médico (Dr. Albert), com PDF anexado
   try { await sendEmail({ subject: `PRIMEIRA CONSULTA — ${nome}`, body, name: nome, pdf }); }
-  catch (e) { console.error(e); }
+  catch (e) { console.error('Email para o médico falhou:', e); }
 
-  // Email de confirmação para o paciente
+  // Email 2 → confirmação para o paciente, com PDF anexado
   try {
     await emailjs.send(CFG.serviceId, 'template_ezh3i8t', {
       patient_email: email,
       patient_name:  nome,
+      pdf_base64:    pdf,
     });
   } catch (e) { console.error('Confirmação ao paciente falhou:', e); }
 
