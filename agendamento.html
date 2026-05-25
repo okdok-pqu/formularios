@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- EmailJS removido — dispatch via Make.com webhook -->
 <style>
 :root {
   --navy:   #001941;
@@ -28,7 +27,7 @@
 body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-height:100vh;padding:40px 20px 80px}
 .shell{max-width:600px;margin:0 auto}
 
-/* ── Progress ── */
+/* ── Progress (3 barras) ── */
 .prog-wrap{display:flex;align-items:center;gap:5px;margin-bottom:32px}
 .prog-bar{flex:1;height:3px;background:var(--grey);border-radius:2px;transition:background .4s}
 .prog-bar.done{background:var(--navy)}
@@ -39,6 +38,7 @@ body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-h
 .card{background:#fff;border-radius:10px;padding:40px 44px;box-shadow:0 4px 6px rgba(19,28,71,.04), 0 10px 40px rgba(19,28,71,.10)}
 @media(max-width:520px){.card{padding:26px 20px}}
 
+/* ── Calendly card — largura total, sem padding lateral ── */
 /* ── Steps ── */
 .step{display:none}.step.on{display:block}
 
@@ -82,7 +82,7 @@ body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-h
 .resp-blk.on{display:block}
 .blk-lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
 
-/* ── Option cards ── */
+/* ── Option cards (farmacogenética) ── */
 .oc-list{display:flex;flex-direction:column;gap:10px}
 .oc{border:2px solid var(--grey);border-radius:8px;padding:15px 16px;cursor:pointer;transition:border-color var(--tr),background var(--tr);display:flex;align-items:flex-start;gap:12px;user-select:none}
 .oc:hover{border-color:var(--copper)}
@@ -92,34 +92,6 @@ body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-h
 .oc.sel .oc-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
 .oc-ttl{font-size:15px;font-weight:500;color:var(--navy);margin-bottom:3px}
 .oc-dsc{font-size:13px;color:var(--muted);line-height:1.4}
-
-/* ── Availability grid ── */
-.av-wrap{border:1.5px solid var(--grey);border-radius:var(--r);overflow:hidden;margin-bottom:6px}
-.av-tbl{width:100%;border-collapse:collapse;font-size:13px}
-.av-tbl th{padding:9px 12px;text-align:center;font-weight:500;color:var(--muted);background:#fafafa;border-bottom:1.5px solid var(--grey)}
-.av-tbl th:first-child{text-align:left;padding-left:14px}
-.av-tbl td{padding:0;text-align:center;border-bottom:1px solid var(--grey)}
-.av-tbl tr:last-child td{border-bottom:none}
-.av-tbl td:first-child{font-weight:500;color:var(--mid);text-align:left;padding:10px 12px 10px 14px}
-/* Checkbox cell — styled toggle */
-.av-cell{position:relative;width:60px;height:44px;display:table-cell;vertical-align:middle}
-.av-cell input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
-.av-cell label{display:flex;align-items:center;justify-content:center;width:100%;height:100%;cursor:pointer}
-.av-cell label span{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:28px;height:28px;border-radius:5px;
-  background:var(--grey);
-  transition:background var(--tr),transform .1s;
-  font-size:14px;color:transparent;
-  user-select:none;
-}
-.av-cell input:checked + label span{
-  background:var(--fill);
-  color:#fff;
-  transform:scale(1.05);
-}
-.av-cell label:hover span{background:#ccc}
-.av-cell input:checked + label:hover span{background:#333}
 
 /* ── Contract ── */
 .ct-prev{border:1.5px solid var(--grey);border-radius:var(--r);padding:18px 20px;max-height:240px;overflow-y:auto;font-size:13px;color:var(--mid);line-height:1.65;margin-bottom:12px;background:#fafafa}
@@ -163,6 +135,9 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
 .no-email-note{display:none;align-items:flex-start;gap:9px;background:rgba(0,25,65,.04);border:1px solid rgba(0,25,65,.1);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--mid);line-height:1.55;margin-top:10px;margin-bottom:4px}
 .no-email-note.on{display:flex}
 .no-email-note svg{flex-shrink:0;margin-top:1px;stroke:var(--muted)}
+
+/* ── Calendly step ── */
+/* ── Success (só para fale comigo) ── */
 .succ{display:none;text-align:center;padding:16px 0 8px}
 .succ.on{display:block}
 .succ-ico{width:60px;height:60px;border-radius:50%;background:rgba(42,127,111,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px}
@@ -173,17 +148,15 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
 <body>
 <div class="shell">
 
-  <!-- Progress -->
+  <!-- Progress (3 barras — só para novo paciente) -->
   <div class="prog-wrap" id="pw">
     <div class="prog-bar cur" id="pb0"></div>
-    <div class="prog-bar" id="pb1"></div>
-    <div class="prog-bar" id="pb2"></div>
-    <div class="prog-bar" id="pb3"></div>
-    <div class="prog-bar" id="pb4"></div>
-    <span class="prog-lbl" id="plbl">Etapa 1 de 5</span>
+    <div class="prog-bar"     id="pb1"></div>
+    <div class="prog-bar"     id="pb2"></div>
+    <span class="prog-lbl" id="plbl">Etapa 1 de 3</span>
   </div>
 
-  <div class="card">
+  <div class="card" id="mainCard">
 
     <!-- ══ STEP 0 : Bifurcação ══ -->
     <div class="step on" id="s0">
@@ -192,7 +165,6 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
       <div class="bifc">
         <div class="bc" id="bc_ret" onclick="pickFlow('ret')">
           <div class="bc-ico">
-            <!-- calendar with checkmark — returning patient -->
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2"/>
               <line x1="3" y1="9" x2="21" y2="9"/>
@@ -206,7 +178,6 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         </div>
         <div class="bc" id="bc_new" onclick="pickFlow('new')">
           <div class="bc-ico">
-            <!-- user with plus — new patient -->
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="10" cy="7" r="4"/>
               <path d="M2 21c0-4 3.6-7 8-7"/>
@@ -228,7 +199,7 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
     <!-- ══ STEP RETORNO ══ -->
     <div class="step" id="sR">
       <div class="ttl">Consulta de retorno</div>
-      <div class="sub">Confirme seus dados e preferência de horário.</div>
+      <div class="sub">Confirme seus dados para prosseguir ao agendamento.</div>
 
       <div class="f" id="fR_nome">
         <label>Nome completo <span class="req">*</span></label>
@@ -249,43 +220,12 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         </label>
       </div>
 
-      <!-- nota exibida quando paciente não lembra o email -->
       <div class="no-email-note" id="noEmailNote">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Sem problema — sua solicitação será enviada normalmente. Como não teremos seu email, você não receberá uma confirmação por escrito, mas minha secretária entrará em contato até o final do dia para confirmar o horário.
+        Sem problema — você pode prosseguir. O Calendly pedirá seu email ao confirmar o horário.
       </div>
 
       <hr class="dv">
-
-      <div class="f">
-        <label>Disponibilidade <span class="req">*</span></label>
-        <div class="av-wrap">
-          <table class="av-tbl" id="r_av">
-            <thead><tr><th></th><th>Manhã</th><th>Tarde</th><th>Noite</th></tr></thead>
-            <tbody>
-              <tr>
-                <td>Seg – Ter</td>
-                <td class="av-cell"><input type="checkbox" id="rST_m" data-s="Seg-Ter Manhã"><label for="rST_m"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="rST_t" data-s="Seg-Ter Tarde"><label for="rST_t"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="rST_n" data-s="Seg-Ter Noite"><label for="rST_n"><span>✓</span></label></td>
-              </tr>
-              <tr>
-                <td>Qua – Qui</td>
-                <td class="av-cell"><input type="checkbox" id="rQQ_m" data-s="Qua-Qui Manhã"><label for="rQQ_m"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="rQQ_t" data-s="Qua-Qui Tarde"><label for="rQQ_t"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="rQQ_n" data-s="Qua-Qui Noite"><label for="rQQ_n"><span>✓</span></label></td>
-              </tr>
-              <tr>
-                <td>Sexta</td>
-                <td class="av-cell"><input type="checkbox" id="rSx_m" data-s="Sex Manhã"><label for="rSx_m"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="rSx_t" data-s="Sex Tarde"><label for="rSx_t"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="rSx_n" data-s="Sex Noite"><label for="rSx_n"><span>✓</span></label></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="ferr" id="r_av_err" style="display:none">Selecione ao menos um período</div>
-      </div>
 
       <div class="f">
         <label>Algum assunto específico? <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
@@ -295,7 +235,7 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
       <div class="btn-row">
         <button class="btn btn-g" onclick="goto('s0')">← Voltar</button>
         <button class="btn btn-p" id="bRsub" onclick="submitRet()">
-          <span class="lbl">Enviar solicitação</span><span class="spin"></span>
+          <span class="lbl">Escolher horário →</span><span class="spin"></span>
         </button>
       </div>
     </div>
@@ -368,52 +308,10 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
       </div>
     </div>
 
-    <!-- ══ STEP 3 : Disponibilidade ══ -->
-    <div class="step" id="s3">
-      <div class="ttl">Disponibilidade</div>
-      <div class="sub">Selecione os períodos em que você está disponível. Ingrid entrará em contato para confirmar o horário exato.</div>
-      <div class="f">
-        <div class="av-wrap">
-          <table class="av-tbl" id="n_av">
-            <thead><tr><th></th><th>Manhã</th><th>Tarde</th><th>Noite</th></tr></thead>
-            <tbody>
-              <tr>
-                <td>Seg – Ter</td>
-                <td class="av-cell"><input type="checkbox" id="nST_m" data-s="Seg-Ter Manhã"><label for="nST_m"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="nST_t" data-s="Seg-Ter Tarde"><label for="nST_t"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="nST_n" data-s="Seg-Ter Noite"><label for="nST_n"><span>✓</span></label></td>
-              </tr>
-              <tr>
-                <td>Qua – Qui</td>
-                <td class="av-cell"><input type="checkbox" id="nQQ_m" data-s="Qua-Qui Manhã"><label for="nQQ_m"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="nQQ_t" data-s="Qua-Qui Tarde"><label for="nQQ_t"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="nQQ_n" data-s="Qua-Qui Noite"><label for="nQQ_n"><span>✓</span></label></td>
-              </tr>
-              <tr>
-                <td>Sexta</td>
-                <td class="av-cell"><input type="checkbox" id="nSx_m" data-s="Sex Manhã"><label for="nSx_m"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="nSx_t" data-s="Sex Tarde"><label for="nSx_t"><span>✓</span></label></td>
-                <td class="av-cell"><input type="checkbox" id="nSx_n" data-s="Sex Noite"><label for="nSx_n"><span>✓</span></label></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="ferr" id="n_av_err" style="display:none">Selecione ao menos um período</div>
-      </div>
-      <div class="f">
-        <label>Observações de agenda <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
-        <textarea id="n_obs" placeholder="Restrições específicas, urgências, preferências…"></textarea>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-g" onclick="goto('s2')">← Voltar</button>
-        <button class="btn btn-p" onclick="valS3()"><span class="lbl">Continuar →</span></button>
-      </div>
-    </div>
-
-    <!-- ══ STEP 4 : Contrato ══ -->
+    <!-- ══ STEP 3 : Contrato ══ -->
     <div class="step" id="s4">
       <div class="ttl">Contrato terapêutico</div>
-      <div class="sub">Essa é uma versão resumida. Leia as condições do atendimento antes de confirmar.</div>
+      <div class="sub">Leia as condições do atendimento antes de confirmar.</div>
       <div class="ct-prev">
         <h3>CONTRATO TERAPÊUTICO</h3>
         <p><em>Consulta Psiquiátrica Particular — Condições do atendimento | Direitos e responsabilidades</em></p>
@@ -456,14 +354,35 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         <div class="acc-txt">Li e aceito os termos do <strong>Contrato Terapêutico</strong> do Dr. Albert Felipe Mojzeszowicz (CRM-SP 175671).</div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-g" onclick="goto('s3')">← Voltar</button>
+        <button class="btn btn-g" onclick="goto('s2')">← Voltar</button>
         <button class="btn btn-p" id="bSub" onclick="submitNew()" disabled>
-          <span class="lbl">Confirmar agendamento</span><span class="spin"></span>
+          <span class="lbl">Aceito — escolher horário →</span><span class="spin"></span>
         </button>
       </div>
     </div>
 
-    <!-- ══ STEP FALE COMIGO ══ -->
+    <!-- ══ STEP CALENDLY — abre em nova aba (evita bloqueio de iframe) ══ -->
+    <div class="step" id="sCalendly">
+      <div style="text-align:center;padding:12px 0 8px">
+        <div class="succ-ico" style="margin-bottom:20px">✓</div>
+        <div class="ttl" style="margin-bottom:8px">Quase lá!</div>
+        <p class="sub" id="calSub" style="margin-bottom:28px;max-width:340px;margin-left:auto;margin-right:auto">
+          Seus dados foram recebidos. Agora escolha seu horário.
+        </p>
+        <a id="calLink" href="#" target="_blank" rel="noopener"
+           class="btn btn-p"
+           style="font-size:15px;padding:14px 36px;display:inline-flex">
+          Escolher horário →
+        </a>
+        <p style="font-size:13px;color:var(--muted);margin-top:20px;line-height:1.6">
+          O link abre numa nova aba.<br>
+          Você precisará confirmar seu nome e email no Calendly.<br>
+          A confirmação chega no seu email ao concluir.
+        </p>
+      </div>
+    </div>
+
+    <!-- ══ STEP FALE COMIGO (sem alterações) ══ -->
     <div class="step" id="sFale">
       <div class="ttl">Fale comigo</div>
       <div class="sub">Envie sua mensagem. Responderei em até 48h úteis.</div>
@@ -473,13 +392,11 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         <input type="text" id="f_nome_fale" placeholder="Seu nome">
         <span class="ferr">Campo obrigatório</span>
       </div>
-
       <div class="f" id="fF_contato">
         <label>E-mail ou celular <span class="req">*</span></label>
         <input type="text" id="f_contato" placeholder="seu@email.com ou (11) 99999-9999">
         <span class="ferr">Informe ao menos um contato</span>
       </div>
-
       <div class="f" id="fF_assunto">
         <label>Assunto <span class="req">*</span></label>
         <select id="f_assunto">
@@ -492,14 +409,12 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         </select>
         <span class="ferr">Selecione um assunto</span>
       </div>
-
       <div class="f">
         <label>Mensagem <span class="req">*</span></label>
         <textarea id="f_msg" placeholder="Descreva sua dúvida ou mensagem…" maxlength="500" oninput="updChar()" rows="4"></textarea>
         <div class="char-count"><span id="charN">0</span> / 500</div>
         <span class="ferr" id="f_msg_err">Campo obrigatório</span>
       </div>
-
       <div class="btn-row">
         <button class="btn btn-g" onclick="goto('s0')">← Voltar</button>
         <button class="btn btn-p" id="bFsub" onclick="submitFale()">
@@ -508,7 +423,7 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
       </div>
     </div>
 
-    <!-- ══ SUCCESS ══ -->
+    <!-- ══ SUCCESS — só para Fale Comigo ══ -->
     <div class="succ" id="sOk">
       <div class="succ-ico">✓</div>
       <h2>Mensagem enviada</h2>
@@ -520,15 +435,10 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
 
 <script>
 // ════════════════════════════════════════════════
-// ⚙️  CONFIGURAÇÃO — Make.com
-// Substitua pela URL gerada no seu webhook (Webhooks › Custom Webhook)
+// ⚙️  CONFIGURAÇÃO
 // ════════════════════════════════════════════════
-const MAKE_WEBHOOK = 'https://hook.eu1.make.com/opb3o4rmutlu1ybd4lwecp8aor6b3tdu';
-
-// URL completa do event type no Calendly (copie direto do seu painel Calendly)
-// Abra seu Calendly → clique no event type → "Copy Link" → cole só o caminho após calendly.com/
-// Ex.: 'agenda-dr-albert/primeira-consulta-psiquiatria'
-const CALENDLY_EVENT_URL = 'agenda-dr-albert/agenda-dr-albert'; // ← SUBSTITUIR pelo caminho real
+const MAKE_WEBHOOK   = 'https://hook.eu1.make.com/opb3o4rmutlu1ybd4lwecp8aor6b3tdu';
+const CALENDLY_EVENT = 'agenda-dr-albert/agenda-dr-albert';
 
 // ════════════════════════════════════════════════
 // STATE
@@ -536,13 +446,11 @@ const CALENDLY_EVENT_URL = 'agenda-dr-albert/agenda-dr-albert'; // ← SUBSTITUI
 let flow = null, farma = null, acceptTS = null;
 
 // ════════════════════════════════════════════════
-// ENTRY POINT — ?fale=1 bypasses funnel
+// ENTRY POINT — suporte a ?fale=1 e #fale
 // ════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  // Suporta tanto ?fale=1 (acesso direto) quanto #fale (via iframe/Wix)
   const params = new URLSearchParams(window.location.search);
-  const hash   = window.location.hash;
-  if (params.get('fale') === '1' || hash === '#fale') {
+  if (params.get('fale') === '1' || window.location.hash === '#fale') {
     hideProg();
     goto('sFale');
   }
@@ -557,14 +465,14 @@ function goto(id) {
   window.scrollTo(0, 0);
 }
 
-function setProgress(cur, total) {
-  for (let i = 0; i < 5; i++) {
-    const b = document.getElementById('pb' + i);
-    b.classList.remove('cur', 'done');
-    if (i < cur - 1) b.classList.add('done');
+function setProgress(cur) {
+  ['pb0','pb1','pb2'].forEach((id, i) => {
+    const b = document.getElementById(id);
+    b.classList.remove('cur','done');
+    if (i < cur - 1)     b.classList.add('done');
     else if (i === cur - 1) b.classList.add('cur');
-  }
-  document.getElementById('plbl').textContent = `Etapa ${cur} de ${total}`;
+  });
+  document.getElementById('plbl').textContent = `Etapa ${cur} de 3`;
 }
 
 function hideProg() {
@@ -576,7 +484,7 @@ function hideProg() {
 // ════════════════════════════════════════════════
 function pickFlow(f) {
   flow = f;
-  ['ret', 'new'].forEach(k => {
+  ['ret','new'].forEach(k => {
     const el = document.getElementById('bc_' + k);
     if (el) el.classList.toggle('sel', k === f);
   });
@@ -585,35 +493,35 @@ function pickFlow(f) {
 
 function goFromS0() {
   if (!flow) return;
-  if (flow === 'ret')  { goto('sR');    setProgress(1, 2); }
-  if (flow === 'new')  { goto('s1');    setProgress(1, 5); }
-  if (flow === 'fale') { goto('sFale'); hideProg(); }
+  if (flow === 'ret')  { hideProg(); goto('sR'); }
+  if (flow === 'new')  { setProgress(1); goto('s1'); }
+  if (flow === 'fale') { hideProg(); goto('sFale'); }
 }
 
 // ════════════════════════════════════════════════
 // MASKS & VALIDATORS
 // ════════════════════════════════════════════════
 function mCPF(el) {
-  let v = el.value.replace(/\D/g, '');
-  if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
-  else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
-  else if (v.length > 3) v = v.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+  let v = el.value.replace(/\D/g,'');
+  if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');
+  else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');
+  else if (v.length > 3) v = v.replace(/(\d{3})(\d{0,3})/,'$1.$2');
   el.value = v;
 }
 function mTel(el) {
-  let v = el.value.replace(/\D/g, '');
-  if (v.length > 10) v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
-  else if (v.length > 6) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
-  else if (v.length > 2) v = v.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+  let v = el.value.replace(/\D/g,'');
+  if (v.length > 10) v = v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+  else if (v.length > 6) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  else if (v.length > 2) v = v.replace(/(\d{2})(\d{0,5})/,'($1) $2');
   el.value = v;
 }
 function okCPF(c) {
-  c = c.replace(/\D/g, '');
+  c = c.replace(/\D/g,'');
   if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
-  let s = 0; for (let i = 0; i < 9; i++) s += +c[i] * (10 - i);
-  let r = (s * 10) % 11; if (r === 10 || r === 11) r = 0; if (r !== +c[9]) return false;
-  s = 0; for (let i = 0; i < 10; i++) s += +c[i] * (11 - i);
-  r = (s * 10) % 11; if (r === 10 || r === 11) r = 0; return r === +c[10];
+  let s=0; for(let i=0;i<9;i++) s+=+c[i]*(10-i);
+  let r=(s*10)%11; if(r===10||r===11)r=0; if(r!==+c[9]) return false;
+  s=0; for(let i=0;i<10;i++) s+=+c[i]*(11-i);
+  r=(s*10)%11; if(r===10||r===11)r=0; return r===+c[10];
 }
 function req(fid, iid, fn) {
   const el = document.getElementById(fid), v = document.getElementById(iid).value.trim();
@@ -625,57 +533,44 @@ function updChar() {
 }
 
 // ════════════════════════════════════════════════
-// STEP 1
+// STEP 1 — Dados pessoais
 // ════════════════════════════════════════════════
 function togResp() {
   document.getElementById('respBlk').classList.toggle('on', document.getElementById('chkResp').checked);
 }
 function valS1() {
   const ok = [
-    req('f_nome', 'p_nome'),
-    req('f_nasc', 'p_nasc'),
-    req('f_cpf', 'p_cpf', v => okCPF(v)),
-    req('f_tel', 'p_tel', v => v.replace(/\D/g, '').length >= 10),
-    req('f_email', 'p_email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)),
+    req('f_nome','p_nome'),
+    req('f_nasc','p_nasc'),
+    req('f_cpf','p_cpf', v => okCPF(v)),
+    req('f_tel','p_tel', v => v.replace(/\D/g,'').length >= 10),
+    req('f_email','p_email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)),
   ].every(Boolean);
   let okR = true;
   if (document.getElementById('chkResp').checked) {
     okR = [
-      req('f_r_nome', 'resp_nome'),
-      req('f_r_tel', 'resp_tel', v => v.replace(/\D/g, '').length >= 10),
+      req('f_r_nome','resp_nome'),
+      req('f_r_tel','resp_tel', v => v.replace(/\D/g,'').length >= 10),
     ].every(Boolean);
   }
-  if (ok && okR) { goto('s2'); setProgress(2, 5); }
+  if (ok && okR) { setProgress(2); goto('s2'); }
 }
 
 // ════════════════════════════════════════════════
-// STEP 2
+// STEP 2 — Farmacogenética
 // ════════════════════════════════════════════════
 function pickFarma(v) {
   farma = v;
-  ['sim', 'nao', 'nd'].forEach(k => document.getElementById('oc_' + k).classList.toggle('sel', k === v));
+  ['sim','nao','nd'].forEach(k => document.getElementById('oc_'+k).classList.toggle('sel', k===v));
   document.getElementById('farma_err').style.display = 'none';
 }
 function valS2() {
   if (!farma) { document.getElementById('farma_err').style.display = 'block'; return; }
-  goto('s3'); setProgress(3, 5);
+  setProgress(3); goto('s4');
 }
 
 // ════════════════════════════════════════════════
-// STEP 3
-// ════════════════════════════════════════════════
-function getSlots(tid) {
-  return Array.from(document.querySelectorAll(`#${tid} input[type=checkbox]:checked`)).map(c => c.dataset.s);
-}
-function valS3() {
-  const s = getSlots('n_av');
-  if (!s.length) { document.getElementById('n_av_err').style.display = 'block'; return; }
-  document.getElementById('n_av_err').style.display = 'none';
-  goto('s4'); setProgress(4, 5);
-}
-
-// ════════════════════════════════════════════════
-// STEP 4 — CONTRACT
+// STEP 3 — Contrato
 // ════════════════════════════════════════════════
 function togAcc() { const c = document.getElementById('chkAcc'); c.checked = !c.checked; updAcc(); }
 function updAcc() {
@@ -685,345 +580,201 @@ function updAcc() {
 }
 
 // ════════════════════════════════════════════════
-// buildPDFDoc — VERSÃO v7 INTEGRAL
-// Gera PDF com texto completo do Contrato Terapêutico v7
-// + bloco de aceite digital com dados do paciente no topo
+// PDF — Contrato Terapêutico v7
 // ════════════════════════════════════════════════
 function buildPDFDoc() {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
 
-  // ── Dados do paciente ──
-  const nome  = document.getElementById('p_nome').value.trim();
-  const nasc  = document.getElementById('p_nasc').value;
-  const cpf   = document.getElementById('p_cpf').value.trim();
-  const tel   = document.getElementById('p_ddi').value + ' ' + document.getElementById('p_tel').value.trim();
-  const email = document.getElementById('p_email').value.trim();
-  const hoje  = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-  const nascFmt = nasc ? new Date(nasc + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+  const nome    = document.getElementById('p_nome').value.trim();
+  const nasc    = document.getElementById('p_nasc').value;
+  const cpf     = document.getElementById('p_cpf').value.trim();
+  const tel     = document.getElementById('p_ddi').value + ' ' + document.getElementById('p_tel').value.trim();
+  const email   = document.getElementById('p_email').value.trim();
+  const hoje    = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const nascFmt = nasc ? new Date(nasc+'T00:00:00').toLocaleDateString('pt-BR') : '';
 
-  // ── Layout constants (mm, A4 = 210 × 297) ──
-  const ML = 20, MR = 20, MT = 18, MB = 20;
-  const PW = 210, PH = 297;
-  const CW = PW - ML - MR;
-  const NAVY = [0, 25, 65]; // #001941 — cor dos títulos
-  let y = MT;
+  const ML=20,MR=20,MT=18,MB=20,PW=210,PH=297,CW=PW-ML-MR;
+  const NAVY=[0,25,65];
+  let y=MT;
 
-  // ── Helpers ──
-  const space = (n) => { y += n; };
-  const newPageIfNeeded = (need) => {
-    if (y + need > PH - MB) { doc.addPage(); y = MT; }
+  const space = n => { y+=n; };
+  const newPage = need => { if(y+need>PH-MB){doc.addPage();y=MT;} };
+  const para = (text,opts={}) => {
+    const {bold=false,size=10,italic=false,indent=0,leading=5}=opts;
+    const style=bold?(italic?'bolditalic':'bold'):(italic?'italic':'normal');
+    doc.setFont('helvetica',style); doc.setFontSize(size);
+    doc.splitTextToSize(text,CW-indent).forEach(l=>{newPage(leading);doc.text(l,ML+indent,y);y+=leading;});
   };
-  const writeParagraph = (text, opts = {}) => {
-    const { bold = false, size = 10, italic = false, indent = 0, leading = 5, justify = true } = opts;
-    const style = bold ? (italic ? 'bolditalic' : 'bold') : (italic ? 'italic' : 'normal');
-    doc.setFont('helvetica', style);
-    doc.setFontSize(size);
-    const lines = doc.splitTextToSize(text, CW - indent);
-    lines.forEach(line => {
-      newPageIfNeeded(leading);
-      doc.text(line, ML + indent, y);
-      y += leading;
-    });
+  const bullet = (text,opts={}) => {
+    const {size=10,leading=5}=opts;
+    doc.setFont('helvetica','normal'); doc.setFontSize(size);
+    doc.splitTextToSize(text,CW-7).forEach((l,i)=>{newPage(leading);if(i===0)doc.text('•',ML+2,y);doc.text(l,ML+7,y);y+=leading;});
   };
-  const writeBullet = (text, opts = {}) => {
-    const { size = 10, leading = 5 } = opts;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(size);
-    const bulletX = ML + 2;
-    const textX = ML + 7;
-    const lines = doc.splitTextToSize(text, CW - 7);
-    lines.forEach((line, i) => {
-      newPageIfNeeded(leading);
-      if (i === 0) doc.text('•', bulletX, y);
-      doc.text(line, textX, y);
-      y += leading;
-    });
+  const heading = (text,opts={}) => {
+    const {size=12,before=4,after=2}=opts;
+    space(before); newPage(size*0.5+after+2);
+    doc.setFont('helvetica','bold'); doc.setFontSize(size);
+    doc.setTextColor(...NAVY); doc.text(text,ML,y); doc.setTextColor(0,0,0);
+    y+=size*0.45+after;
   };
-  const writeHeading = (text, opts = {}) => {
-    const { size = 12, before = 4, after = 2 } = opts;
-    space(before);
-    newPageIfNeeded(size * 0.5 + after + 2);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(size);
-    doc.setTextColor(...NAVY);
-    doc.text(text, ML, y);
-    doc.setTextColor(0, 0, 0);
-    y += size * 0.45 + after;
-  };
-  const writeRule = () => {
-    newPageIfNeeded(4);
-    doc.setDrawColor(180);
-    doc.setLineWidth(0.2);
-    doc.line(ML, y, PW - MR, y);
-    y += 4;
-  };
+  const rule = () => { newPage(4); doc.setDrawColor(180); doc.setLineWidth(0.2); doc.line(ML,y,PW-MR,y); y+=4; };
 
-  // ═══════════════ CABEÇALHO ═══════════════
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(...NAVY);
-  doc.text('Dr. Albert Felipe Mojzeszowicz  |  Psiquiatria', ML, y);
-  doc.setTextColor(0, 0, 0);
-  y += 5;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.text('CRM-SP 175671  |  RQE 87037', ML, y);
-  y += 7;
+  // Cabeçalho
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(...NAVY);
+  doc.text('Dr. Albert Felipe Mojzeszowicz  |  Psiquiatria',ML,y); doc.setTextColor(0,0,0); y+=5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.text('CRM-SP 175671  |  RQE 87037',ML,y); y+=7;
+  doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(...NAVY);
+  doc.text('CONTRATO TERAPÊUTICO',ML,y); doc.setTextColor(0,0,0); y+=6;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('Consulta Psiquiátrica Particular',ML,y); y+=4.5;
+  doc.setFont('helvetica','italic'); doc.setFontSize(9); doc.text('Condições do atendimento  |  Direitos e responsabilidades',ML,y); y+=6;
+  rule();
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(15);
-  doc.setTextColor(...NAVY);
-  doc.text('CONTRATO TERAPÊUTICO', ML, y);
-  doc.setTextColor(0, 0, 0);
-  y += 6;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.text('Consulta Psiquiátrica Particular', ML, y);
-  y += 4.5;
-  doc.setFont('helvetica', 'italic');
-  doc.setFontSize(9);
-  doc.text('Condições do atendimento  |  Direitos e responsabilidades', ML, y);
-  y += 6;
-
-  writeRule();
-
-  // ═══════════════ BLOCO DE ACEITE ═══════════════
-  writeHeading('ACEITE DIGITAL', { size: 10, before: 0, after: 1 });
-  writeParagraph(`Aceito por: ${nome}`, { size: 9, leading: 4.2 });
-  writeParagraph(`CPF: ${cpf}`, { size: 9, leading: 4.2 });
-  writeParagraph(`Timestamp: ${acceptTS ? new Date(acceptTS).toLocaleString('pt-BR') : '—'}`, { size: 9, leading: 4.2 });
+  heading('ACEITE DIGITAL',{size:10,before:0,after:1});
+  para(`Aceito por: ${nome}`,{size:9,leading:4.2});
+  para(`CPF: ${cpf}`,{size:9,leading:4.2});
+  para(`Timestamp: ${new Date(acceptTS).toLocaleString('pt-BR')}`,{size:9,leading:4.2});
   space(2);
 
-  writeHeading('IDENTIFICAÇÃO DO PACIENTE', { size: 10, before: 1, after: 1 });
-  writeParagraph(`Nome: ${nome}`, { size: 9, leading: 4.2 });
-  writeParagraph(`Nascimento: ${nascFmt}`, { size: 9, leading: 4.2 });
-  writeParagraph(`CPF: ${cpf}`, { size: 9, leading: 4.2 });
-  writeParagraph(`Telefone: ${tel.trim()}`, { size: 9, leading: 4.2 });
-  writeParagraph(`E-mail: ${email}`, { size: 9, leading: 4.2 });
+  heading('IDENTIFICAÇÃO DO PACIENTE',{size:10,before:1,after:1});
+  para(`Nome: ${nome}`,{size:9,leading:4.2});
+  para(`Nascimento: ${nascFmt}`,{size:9,leading:4.2});
+  para(`CPF: ${cpf}`,{size:9,leading:4.2});
+  para(`Telefone: ${tel.trim()}`,{size:9,leading:4.2});
+  para(`E-mail: ${email}`,{size:9,leading:4.2});
+  space(2); rule();
+
+  para('Este documento serve para tornar o tratamento previsível para os dois lados: o paciente sabe o que pode esperar; o médico pode trabalhar com organização e dedicação.');
   space(2);
-  writeRule();
+  para('Uma relação entre médico e paciente que não contenha confiança e transparência nunca será terapêutica. As regras aqui propostas existem para proteger a qualidade do cuidado e o melhor resultado possível para cada paciente.');
 
-  // ═══════════════ PREÂMBULO ═══════════════
-  writeParagraph(
-    'Este documento serve para tornar o tratamento previsível para os dois lados: ' +
-    'o paciente sabe o que pode esperar; o médico pode trabalhar com organização e dedicação.'
-  );
+  heading('1. Obrigações do Médico');
+  heading('1.1  Cuidado e ética',{size:10,before:1,after:1});
+  bullet('Conduzir as consultas com base no conhecimento científico e nos princípios da Declaração de Genebra, adotada pela Associação Médica Mundial.');
+  bullet('Manter sigilo sobre todas as informações clínicas e pessoais do paciente, mesmo após sua morte.');
+  bullet('Comunicar diagnósticos e responder dúvidas de forma acessível ao paciente.');
+  bullet('Prescrever medicamentos com base em critérios clínicos, informando benefícios e riscos relevantes.');
+  bullet('Contatar outros serviços ou especialistas sempre que necessário.');
+  bullet('Em situação de risco imediato, garantir encaminhamento antes de encerrar o atendimento.');
+  heading('1.2  Organização e comunicação',{size:10,before:2,after:1});
+  bullet('Manter agenda com regularidade e comunicar cancelamentos com 24 horas de antecedência, salvo motivo de força maior.');
+  bullet('Responder mensagens fora do horário de consulta em até 24–48 horas úteis, exceto em urgências e emergências.');
+  bullet('Emitir atestados, laudos e receituários com base em avaliação clínica.');
+  bullet('Fornecer resumo clínico ou cópia do prontuário a qualquer momento.');
+  heading('1.3  Encerramento do acompanhamento',{size:10,before:2,after:1});
+  bullet('O médico pode encerrar o acompanhamento em casos de incompatibilidade relacional ou razões pessoais, com comunicação com 30 dias de antecedência.');
+  bullet('Fornecerá resumo clínico e indicará outro profissional para continuidade do tratamento.');
+  bullet('Garantirá atendimento de urgência ou encaminhamento durante a transição.');
+
+  heading('2. Responsabilidades do Paciente',{before:4});
+  heading('2.1  Participação no tratamento',{size:10,before:1,after:1});
+  bullet('Comparecer às consultas agendadas ou cancelar com pelo menos 1 dia de antecedência.');
+  bullet('Colher os exames solicitados e encaminhar o resultado ao médico antes da próxima consulta.');
+  bullet('Responder às perguntas do médico do modo mais completo possível.');
+  bullet('Comunicar por WhatsApp o desejo de interromper ou alterar qualquer item da prescrição ou medida não farmacológica antes de fazê-lo.');
+  heading('2.2  Uso de medicamentos e terapias não farmacológicas',{size:10,before:2,after:1});
+  bullet('Utilizar os medicamentos conforme orientado e esclarecer dúvidas por WhatsApp diretamente com o médico.');
+  bullet('Discutir na consulta preferências ou resistências em relação à prescrição.');
+  bullet('Comunicar ao médico alterações na prescrição recomendadas por outros profissionais.');
+
+  heading('3. Honorários e Cancelamentos',{before:4});
+  para('Cancelamentos:',{bold:true});
+  bullet('Com 1 dia ou mais de antecedência: sem cobrança.');
+  bullet('Com menos de 12 horas de antecedência: cobrança de 30% do valor da consulta.');
+  bullet('Sem aviso (não comparecimento): cobrança do valor integral da consulta.');
+  bullet('Cancelamentos do médico: sem ônus ao paciente, com reagendamento prioritário.');
+
+  heading('4. Comunicação Fora da Consulta',{before:4});
+  heading('4.1  Canal e horário',{size:10,before:1,after:1});
+  bullet('WhatsApp em horário comercial, por texto ou áudio.');
+  bullet('Agendamentos e questões administrativas: Ingrid (11) 97105-7112.');
+  heading('4.2  Limites do canal',{size:10,before:2,after:1});
+  bullet('Avaliações diagnósticas e início de novos medicamentos requerem consulta.');
+
+  heading('5. Plano de Segurança',{before:4});
+  para('Em crise aguda com risco imediato, o paciente ou responsável aciona o SAMU (192) ou o CVV (188) e, se necessário, dirige-se ao Pronto-Socorro sem aguardar retorno do médico.');
+
+  heading('6. Privacidade e Dados',{before:4});
+  para('As informações clínicas e pessoais do paciente são tratadas com base na Lei Geral de Proteção de Dados (Lei 13.709/2018 — LGPD).');
+
+  heading('7. Telepsiquiatria',{before:4});
+  para('Consultas por videoconferência seguem as mesmas condições deste acordo. O paciente deve garantir ambiente reservado e conexão estável.');
+
+  heading('8. Vigência e Revisão',{before:4});
+  para('Este acordo tem validade por prazo indeterminado a partir da assinatura e pode ser revisado por iniciativa de qualquer das partes.');
+
+  heading('9. Identificação e Assinatura',{before:4});
   space(2);
-  writeParagraph(
-    'Uma relação entre médico e paciente que não contenha confiança e transparência nunca será terapêutica. ' +
-    'As regras aqui propostas existem para proteger a qualidade do cuidado e o melhor resultado possível para cada paciente. ' +
-    'Elas se baseiam no pressuposto de boa-fé entre as partes e na natureza da relação médico-paciente pautada por humanidade e confiança — ' +
-    'e é por isso que este documento fala como médico, não como jurista.'
-  );
+  para(`Local e data: ____________________________________, ${hoje}`,{size:9.5});
+  space(14); newPage(22);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setDrawColor(80); doc.setLineWidth(0.3);
+  doc.line(ML,y,ML+75,y); doc.line(PW-MR-75,y,PW-MR,y); y+=4;
+  doc.text('Dr. Albert Felipe Mojzeszowicz',ML,y);
+  doc.text(nome||'Paciente',PW-MR-75,y); y+=4;
+  doc.setFontSize(8); doc.setTextColor(100);
+  doc.text('CRM-SP 175671  |  RQE 87037',ML,y);
+  doc.text(`Aceite digital — ${new Date(acceptTS).toLocaleString('pt-BR')}`,PW-MR-75,y);
+  doc.setTextColor(0);
 
-  // ═══════════════ 1. OBRIGAÇÕES DO MÉDICO ═══════════════
-  writeHeading('1. Obrigações do Médico');
-
-  writeHeading('1.1  Cuidado e ética', { size: 10, before: 1, after: 1 });
-  writeBullet('Conduzir as consultas com base no conhecimento científico e nos princípios da Declaração de Genebra, adotada pela Associação Médica Mundial.');
-  writeBullet('Manter sigilo sobre todas as informações clínicas e pessoais do paciente, mesmo após sua morte.');
-  writeBullet('Comunicar diagnósticos e responder dúvidas de forma acessível ao paciente.');
-  writeBullet('Prescrever medicamentos com base em critérios clínicos, informando benefícios e riscos relevantes.');
-  writeBullet('Contatar outros serviços ou especialistas sempre que necessário.');
-  writeBullet('Em situação de risco imediato, garantir encaminhamento antes de encerrar o atendimento.');
-
-  writeHeading('1.2  Organização e comunicação', { size: 10, before: 2, after: 1 });
-  writeBullet('Manter agenda com regularidade e comunicar cancelamentos com 24 horas de antecedência, salvo motivo de força maior.');
-  writeBullet('Responder mensagens fora do horário de consulta em até 24–48 horas úteis, exceto em urgências e emergências.');
-  writeBullet('Emitir atestados, laudos e receituários com base em avaliação clínica.');
-  writeBullet('Fornecer resumo clínico ou cópia do prontuário a qualquer momento — entre consultas ou após o fim do seguimento —, seja para o paciente exercer o direito a uma segunda opinião, seja por outro motivo.');
-
-  writeHeading('1.3  Encerramento do acompanhamento', { size: 10, before: 2, after: 1 });
-  writeBullet('O médico pode encerrar o acompanhamento em casos de incompatibilidade relacional ou razões pessoais, com comunicação com 30 dias de antecedência.');
-  writeBullet('Fornecerá resumo clínico e indicará outro profissional para continuidade do tratamento.');
-  writeBullet('Garantirá atendimento de urgência ou encaminhamento durante a transição.');
-
-  // ═══════════════ 2. RESPONSABILIDADES DO PACIENTE ═══════════════
-  writeHeading('2. Responsabilidades do Paciente', { before: 4 });
-
-  writeHeading('2.1  Participação no tratamento', { size: 10, before: 1, after: 1 });
-  writeBullet('Comparecer às consultas agendadas ou cancelar com pelo menos 1 dia de antecedência.');
-  writeBullet('Colher os exames solicitados e encaminhar o resultado ao médico antes da próxima consulta.');
-  writeBullet('Responder às perguntas do médico do modo mais completo possível. Caso uma informação não esteja disponível, comunicar a impossibilidade.');
-  writeBullet('Comunicar por WhatsApp o desejo de interromper ou alterar qualquer item da prescrição ou medida não farmacológica (p. ex., psicoterapia) antes de fazê-lo.');
-
-  writeHeading('2.2  Uso de medicamentos e terapias não farmacológicas', { size: 10, before: 2, after: 1 });
-  writeBullet('Utilizar os medicamentos conforme orientado e esclarecer dúvidas por WhatsApp diretamente com o médico.');
-  writeBullet('Discutir na consulta preferências ou resistências em relação à prescrição ou à interrupção de qualquer substância, incluindo fitoterápicos e medicações de outras especialidades.');
-  writeBullet('Comunicar ao médico alterações na prescrição recomendadas por outros profissionais.');
-
-  // ═══════════════ 3. CADA ATENDIMENTO INCLUI ═══════════════
-  writeHeading('3. Cada Atendimento Inclui', { before: 4 });
-  writeParagraph('Entrevista estruturada com exame do estado mental e seu registro no prontuário em linguagem clara e sem abreviaturas.');
-  space(2);
-  writeParagraph('Ao término, o médico apresentará a impressão diagnóstica e a conduta terapêutica, com ou sem alteração no regime medicamentoso vigente.');
-
-  // ═══════════════ 4. HONORÁRIOS E CANCELAMENTOS ═══════════════
-  writeHeading('4. Honorários e Cancelamentos', { before: 4 });
-  writeParagraph('Presume-se a boa-fé e a intenção de honrar o compromisso firmado.');
-  space(2);
-  writeParagraph('Cancelamentos:', { bold: true });
-  writeBullet('Com 1 dia ou mais de antecedência: sem cobrança.');
-  writeBullet('Com menos de 12 horas de antecedência: cobrança de 30% do valor da consulta.');
-  writeBullet('Sem aviso (não comparecimento): cobrança do valor integral da consulta.');
-  writeBullet('Cancelamentos do médico: sem ônus ao paciente, com reagendamento prioritário.');
-
-  // ═══════════════ 5. COMUNICAÇÃO FORA DA CONSULTA ═══════════════
-  writeHeading('5. Comunicação Fora da Consulta', { before: 4 });
-
-  writeHeading('5.1  Canal e horário', { size: 10, before: 1, after: 1 });
-  writeBullet('O contato fora da consulta deverá ser feito por WhatsApp, de preferência no horário comercial, por texto ou áudio.');
-  writeBullet('Destina-se a dúvidas sobre medicação já prescrita (dose, horário, modo de tomada) e à comunicação de efeitos adversos.');
-  writeBullet('Agendamentos e questões administrativas devem ser tratados diretamente com a secretária, senhora Ingrid: (11) 97105-7112.');
-  writeBullet('Mensagens fora do horário serão respondidas de acordo com a gravidade, o mais rápido possível.');
-
-  writeHeading('5.2  Limites do canal', { size: 10, before: 2, after: 1 });
-  writeBullet('Sessões de suporte emocional ou psicoterapia não são adequadas para esse canal.');
-  writeBullet('Avaliações diagnósticas e início de novos medicamentos requerem consulta.');
-
-  // ═══════════════ 6. PLANO DE SEGURANÇA ═══════════════
-  writeHeading('6. Plano de Segurança', { before: 4 });
-  writeParagraph(
-    'Situações de crise grave, comportamento de risco, intenção suicida ou de autolesão devem ser comunicadas ao médico, ao psicólogo e ao contato de emergência. ' +
-    'Em crise aguda com risco imediato, o paciente ou responsável aciona o SAMU (192) ou o CVV (188) e, se necessário, dirige-se ao Pronto-Socorro sem aguardar retorno do médico.'
-  );
-  space(2);
-  writeParagraph(
-    'O médico pode solicitar, a critério clínico, que um familiar ou pessoa de confiança esteja ciente do tratamento. ' +
-    'O plano de segurança será revisado ao longo do acompanhamento conforme a evolução clínica.'
-  );
-
-  // ═══════════════ 7. PRIVACIDADE E DADOS ═══════════════
-  writeHeading('7. Privacidade e Dados', { before: 4 });
-  writeParagraph(
-    'As informações clínicas e pessoais do paciente são tratadas com base na Lei Geral de Proteção de Dados (Lei 13.709/2018 — LGPD). ' +
-    'O dado genético, quando gerado por testagem farmacogenética, é classificado como dado sensível pela LGPD e recebe proteção reforçada.'
-  );
-  space(2);
-  writeParagraph(
-    'Os registros serão mantidos em sistema seguro, com acesso restrito, pelo prazo mínimo de 20 anos determinado pelo CFM (Resolução 1821/2007). ' +
-    'Dados não serão compartilhados com terceiros sem autorização expressa do paciente, salvo risco à vida, segurança pública ou obrigação legal de notificação compulsória.'
-  );
-
-  // ═══════════════ 8. TECNOLOGIA E IA ═══════════════
-  writeHeading('8. Uso de Tecnologia e Inteligência Artificial', { before: 4 });
-  writeParagraph(
-    'O acompanhamento pode incluir o uso de ferramentas digitais e, eventualmente, de inteligência artificial (IA) como apoio ao raciocínio clínico. ' +
-    'Qualquer ferramenta de IA utilizada opera como suporte à decisão do médico — nunca como substituta do julgamento clínico ou da relação terapêutica.'
-  );
-  space(2);
-  writeParagraph(
-    'Em consonância com as diretrizes da Organização Mundial da Saúde (OMS) sobre ética e governança da IA em saúde, são princípios que norteiam esse uso: ' +
-    'proteção da autonomia do paciente; transparência sobre o papel da IA no processo; responsabilidade médica integral pela decisão final; ' +
-    'e vedação ao uso de dados do paciente para treino de algoritmos sem consentimento específico.'
-  );
-
-  // ═══════════════ 9. TELEPSIQUIATRIA ═══════════════
-  writeHeading('9. Telepsiquiatria', { before: 4 });
-  writeParagraph(
-    'Consultas por videoconferência seguem as mesmas condições deste acordo. O paciente deve garantir ambiente reservado e conexão estável. ' +
-    'A videoconsulta não substitui o atendimento presencial quando o médico avaliar que a avaliação clínica exige contato direto.'
-  );
-
-  // ═══════════════ 10. ENCERRAMENTO ═══════════════
-  writeHeading('10. Encerramento do Acompanhamento', { before: 4 });
-  writeParagraph(
-    'O acompanhamento pode ser encerrado por iniciativa do paciente, a qualquer momento — comunicação prévia é bem-vinda para planejar a alta ou o encaminhamento; ' +
-    'por iniciativa do médico, nas condições descritas na seção 1.3; ou por alta terapêutica, quando os objetivos do tratamento forem atingidos.'
-  );
-  space(2);
-  writeParagraph('Em qualquer situação, o médico fornecerá resumo clínico e indicará continuidade do cuidado.');
-
-  // ═══════════════ 11. VIGÊNCIA ═══════════════
-  writeHeading('11. Vigência e Revisão', { before: 4 });
-  writeParagraph(
-    'Este acordo tem validade por prazo indeterminado a partir da assinatura e pode ser revisado por iniciativa de qualquer das partes. ' +
-    'A versão vigente estará sempre disponível no site do médico para consulta.'
-  );
-
-  // ═══════════════ 12. ASSINATURA ═══════════════
-  writeHeading('12. Identificação e Assinatura', { before: 4 });
-  space(2);
-  writeParagraph(`Local e data: ____________________________________, ${hoje}`, { size: 9.5 });
-  space(10);
-  newPageIfNeeded(22);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setDrawColor(80);
-  doc.line(ML, y, ML + 75, y);
-  doc.line(PW - MR - 75, y, PW - MR, y);
-  y += 4;
-  doc.text('Dr. Albert Felipe Mojzeszowicz', ML, y);
-  doc.text(nome || 'Paciente', PW - MR - 75, y);
-  y += 4;
-  doc.setFontSize(8);
-  doc.text('CRM-SP 175671  |  RQE 87037', ML, y);
-  doc.text('Paciente (aceite digital)', PW - MR - 75, y);
-
-  // ═══════════════ RODAPÉ ═══════════════
-  const pageCount = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(7.5);
-    doc.setTextColor(120);
-    doc.text(`Contrato Terapêutico  |  v7  |  Página ${i} de ${pageCount}`, PW / 2, PH - 8, { align: 'center' });
+  const pc = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pc;i++){
+    doc.setPage(i); doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(120);
+    doc.text(`Contrato Terapêutico  |  v7  |  Página ${i} de ${pc}`,PW/2,PH-8,{align:'center'});
     doc.setTextColor(0);
   }
-
   return doc;
 }
 
 function openPDF() {
-  try {
-    window.open(buildPDFDoc().output('bloburl'), '_blank');
-  } catch (e) {
-    alert('Preencha seus dados (etapa 1) antes de visualizar o contrato personalizado.');
-  }
+  try { window.open(buildPDFDoc().output('bloburl'),'_blank'); }
+  catch(e) { alert('Preencha seus dados (etapa 1) antes de visualizar o contrato personalizado.'); }
 }
 
 // ════════════════════════════════════════════════
-// EMAIL DISPATCH — via Make.com webhook
+// WEBHOOK DISPATCH
 // ════════════════════════════════════════════════
-async function sendEmail({ subject, body, name, pdf, patientEmail, type }) {
-  const payload = {
-    type:          type || 'generic',
-    subject:       subject,
-    body:          body,
-    patient_name:  name,
-    patient_email: patientEmail || '',
-    pdf_base64:    pdf || '',
-  };
+async function postWebhook(payload) {
   const res = await fetch(MAKE_WEBHOOK, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error('Make.com webhook error: ' + res.status);
+  if (!res.ok) console.error('Webhook error:', res.status);
 }
 
 // ════════════════════════════════════════════════
-// RETORNO — email toggle
+// SHOW CALENDLY — abre em nova aba (sem iframe aninhado)
+// O Calendly inline dentro do HTML element do Wix é bloqueado
+// por política de cookies cross-origin. Botão + nova aba é
+// a única abordagem confiável nesse contexto.
+// ════════════════════════════════════════════════
+function showCalendly(nome, email, subtitle) {
+  if (subtitle) document.getElementById('calSub').textContent = subtitle;
+
+  // Sem parâmetros de prefill: Calendly bloqueia agendamentos
+  // com nome/email pré-preenchidos via URL (falso positivo de bot detection).
+  // O paciente preenche os dois campos no próprio Calendly.
+  const url = `https://calendly.com/${CALENDLY_EVENT}`;
+
+  document.getElementById('calLink').href = url;
+  hideProg();
+  goto('sCalendly');
+}
+
+// ════════════════════════════════════════════════
+// RETORNO — toggle no-email
 // ════════════════════════════════════════════════
 let retSemEmail = false;
-
 function togNoEmail() {
   retSemEmail = document.getElementById('chkNoEmail').checked;
-  const emailInput = document.getElementById('r_email');
-  const note       = document.getElementById('noEmailNote');
-  const emailErr   = document.getElementById('fR_email');
-
+  const inp  = document.getElementById('r_email');
+  const note = document.getElementById('noEmailNote');
+  const err  = document.getElementById('fR_email');
   if (retSemEmail) {
-    emailInput.style.opacity = '0.4';
-    emailInput.style.pointerEvents = 'none';
-    emailInput.value = '';
-    emailErr.classList.remove('err');
-    note.classList.add('on');
+    inp.style.opacity='0.4'; inp.style.pointerEvents='none'; inp.value='';
+    err.classList.remove('err'); note.classList.add('on');
   } else {
-    emailInput.style.opacity = '1';
-    emailInput.style.pointerEvents = 'auto';
-    note.classList.remove('on');
+    inp.style.opacity='1'; inp.style.pointerEvents='auto'; note.classList.remove('on');
   }
 }
 
@@ -1035,54 +786,33 @@ async function submitRet() {
   document.getElementById('fR_nome').classList.toggle('err', !nome);
   if (!nome) return;
 
-  // Validar email só se o paciente não clicou em "não lembro"
   let emailRet = '';
   if (!retSemEmail) {
     emailRet = document.getElementById('r_email').value.trim();
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRet);
-    document.getElementById('fR_email').classList.toggle('err', !emailOk);
-    if (!emailOk) return;
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRet);
+    document.getElementById('fR_email').classList.toggle('err', !ok);
+    if (!ok) return;
   }
-
-  const slots = getSlots('r_av');
-  if (!slots.length) { document.getElementById('r_av_err').style.display = 'block'; return; }
-  document.getElementById('r_av_err').style.display = 'none';
 
   const btn = document.getElementById('bRsub');
   btn.classList.add('ld'); btn.disabled = true;
 
   const obs = document.getElementById('r_obs').value.trim();
-  const ts  = new Date().toLocaleString('pt-BR');
 
-  const body =
-`════════════════════════════════════
-RETORNO — ${nome}
-════════════════════════════════════
+  // Envia contexto ao Make.com (notifica Albert)
+  await postWebhook({
+    type:         'retorno',
+    patient_name: nome,
+    patient_email:emailRet,
+    obs:          obs,
+    timestamp:    new Date().toLocaleString('pt-BR'),
+  });
 
-Paciente : ${nome}
-E-mail   : ${emailRet || '(não informado)'}
-Enviado  : ${ts}
-
-
-DISPONIBILIDADE
-
-${slots.map(s => '  • ' + s).join('\n')}
-
-
-${obs ? 'OBSERVAÇÕES\n\n' + obs : '(sem observações específicas)'}
-
-════════════════════════════════════`;
-
-  try {
-    await sendEmail({
-      type:         'retorno',
-      subject:      `RETORNO — ${nome}`,
-      body:         body,
-      name:         nome,
-      patientEmail: emailRet || '',
-    });
-  } catch (e) { console.error('Webhook retorno error:', e); }
-  showOk(retSemEmail ? 'ret_sem_email' : 'ret', nome);
+  showCalendly(
+    nome,
+    emailRet || '',
+    'Escolha o horário para sua consulta de retorno.'
+  );
 }
 
 // ════════════════════════════════════════════════
@@ -1092,24 +822,23 @@ async function submitNew() {
   const btn = document.getElementById('bSub');
   btn.classList.add('ld'); btn.disabled = true;
 
-  const nome  = document.getElementById('p_nome').value.trim();
-  const nasc  = document.getElementById('p_nasc').value;
-  const cpf   = document.getElementById('p_cpf').value.trim();
-  const ddi   = document.getElementById('p_ddi').value;
-  const tel   = ddi + ' ' + document.getElementById('p_tel').value.trim();
-  const email = document.getElementById('p_email').value.trim();
-  const nascFmt = nasc ? new Date(nasc + 'T00:00:00').toLocaleDateString('pt-BR') : '';
-  const farmaMap = { sim: 'Sim — quer testagem', nao: 'Não — protocolo padrão', nd: 'A decidir na consulta' };
-  const slots = getSlots('n_av');
-  const obs   = document.getElementById('n_obs').value.trim();
-  const ts    = new Date().toLocaleString('pt-BR');
+  const nome    = document.getElementById('p_nome').value.trim();
+  const nasc    = document.getElementById('p_nasc').value;
+  const cpf     = document.getElementById('p_cpf').value.trim();
+  const ddi     = document.getElementById('p_ddi').value;
+  const tel     = ddi + ' ' + document.getElementById('p_tel').value.trim();
+  const email   = document.getElementById('p_email').value.trim();
+  const nascFmt = nasc ? new Date(nasc+'T00:00:00').toLocaleDateString('pt-BR') : '';
+  const farmaMap= {sim:'Sim — quer testagem',nao:'Não — protocolo padrão',nd:'A decidir na consulta'};
+  const obs     = document.getElementById('n_obs')?.value?.trim() || '';
+  const ts      = new Date().toLocaleString('pt-BR');
 
   let resp = '';
   if (document.getElementById('chkResp').checked) {
     const rNome = document.getElementById('resp_nome').value.trim();
     const rTel  = document.getElementById('resp_ddi').value + ' ' + document.getElementById('resp_tel').value.trim();
     const rRel  = document.getElementById('resp_rel').value.trim() || 'não informado';
-    resp = `Nome           : ${rNome}\nCelular        : ${rTel}\nRelação        : ${rRel}`;
+    resp = `\nRESPONSÁVEL\nNome: ${rNome}\nCelular: ${rTel}\nRelação: ${rRel}`;
   }
 
   const body =
@@ -1124,71 +853,57 @@ Nascimento     : ${nascFmt}
 CPF            : ${cpf}
 Celular        : ${tel.trim()}
 E-mail         : ${email}
-${resp ? '\nRESPONSÁVEL\n' + resp.trim() : ''}
+${resp}
 
 ────────────────────────────────────
 
 FARMACOGENÉTICA  ${farmaMap[farma]}
 
-DISPONIBILIDADE
-
-${slots.map(s => '  • ' + s).join('\n')}
-
-${obs ? 'OBSERVAÇÕES\n\n' + obs + '\n' : ''}
-────────────────────────────────────
+${obs ? 'OBSERVAÇÕES\n\n' + obs + '\n\n' : ''}────────────────────────────────────
 
 CONTRATO TERAPÊUTICO
 
 Aceito digitalmente em: ${new Date(acceptTS).toLocaleString('pt-BR')}
-PDF do contrato em anexo (versão v7 — texto integral).
+PDF do contrato em anexo.
 
 ════════════════════════════════════
 Enviado em: ${ts}`;
 
-  // Gera o PDF uma única vez — reutilizado para download + Make.com
-  let pdf = '';
-  let pdfDoc = null;
+  // Gera e baixa o PDF para o paciente
+  let pdf64 = '';
   try {
-    pdfDoc = buildPDFDoc();
-    pdf = pdfDoc.output('datauristring').split(',')[1];
-  } catch (e) { console.error('Falha ao gerar PDF:', e); }
+    const pdfDoc = buildPDFDoc();
+    const safeNome = nome.replace(/[^\w\s-]/g,'').replace(/\s+/g,'_');
+    pdfDoc.save(`Contrato_Terapeutico_${safeNome}.pdf`);
+    pdf64 = pdfDoc.output('datauristring').split(',')[1];
+  } catch(e) { console.error('PDF error:', e); }
 
-  // Download automático — cópia local do contrato aceito pelo paciente
-  if (pdfDoc) {
-    try {
-      const safeNome = nome.replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, '_');
-      pdfDoc.save(`Contrato_Terapeutico_${safeNome}.pdf`);
-    } catch (e) { console.error('Download automático falhou:', e); }
-  }
+  // Envia ao Make.com (Albert recebe email com dados + PDF)
+  await postWebhook({
+    type:          'nova_consulta',
+    subject:       `PRIMEIRA CONSULTA — ${nome}`,
+    body:          body,
+    patient_name:  nome,
+    patient_email: email,
+    pdf_base64:    pdf64,
+  });
 
-  // Webhook Make.com — envia corpo do email, dados do paciente e PDF (Albert + confirmação paciente)
-  try {
-    await sendEmail({
-      type:         'nova_consulta',
-      subject:      `PRIMEIRA CONSULTA — ${nome}`,
-      body:         body,
-      name:         nome,
-      patientEmail: email,
-      pdf:          pdf,
-    });
-  } catch (e) { console.error('Webhook nova consulta error:', e); }
-
-  showOk('new', nome, email);
+  showCalendly(nome, email, 'Escolha o horário para sua primeira consulta.');
 }
 
 // ════════════════════════════════════════════════
-// SUBMIT — FALE COMIGO
+// SUBMIT — FALE COMIGO (sem alterações)
 // ════════════════════════════════════════════════
 async function submitFale() {
   const ok = [
-    req('fF_nome',    'f_nome_fale'),
-    req('fF_contato', 'f_contato'),
-    req('fF_assunto', 'f_assunto'),
+    req('fF_nome','f_nome_fale'),
+    req('fF_contato','f_contato'),
+    req('fF_assunto','f_assunto'),
   ].every(Boolean);
-  const msg = document.getElementById('f_msg').value.trim();
+  const msg   = document.getElementById('f_msg').value.trim();
   const msgEl = document.getElementById('f_msg');
-  msgEl.parentElement.classList.toggle('err', !msg);
-  document.getElementById('f_msg_err').style.display = msg ? 'none' : 'block';
+  msgEl.parentElement.classList.toggle('err',!msg);
+  document.getElementById('f_msg_err').style.display = msg ? 'none':'block';
   if (!ok || !msg) return;
 
   const btn = document.getElementById('bFsub');
@@ -1199,7 +914,10 @@ async function submitFale() {
   const assunto = document.getElementById('f_assunto').value;
   const ts      = new Date().toLocaleString('pt-BR');
 
-  const body =
+  await postWebhook({
+    type:    'fale_comigo',
+    subject: `FALE COMIGO — ${assunto}`,
+    body:
 `════════════════════════════════════
 FALE COMIGO — ${assunto}
 ════════════════════════════════════
@@ -1214,78 +932,15 @@ MENSAGEM
 
 ${msg}
 
-════════════════════════════════════`;
+════════════════════════════════════`,
+    patient_name: nome,
+  });
 
-  try {
-    await sendEmail({
-      type:    'fale_comigo',
-      subject: `FALE COMIGO — ${assunto}`,
-      body:    body,
-      name:    nome,
-    });
-  } catch (e) { console.error('Webhook fale comigo error:', e); }
-  showOk('fale', nome);
-}
-
-// ════════════════════════════════════════════════
-// SUCCESS SCREEN
-// ════════════════════════════════════════════════
-function showOk(type, nome, email) {
+  document.getElementById('sOkMsg').innerHTML = `<strong>${nome}</strong>, sua mensagem foi recebida. Responderei em até 48h úteis.`;
   document.querySelectorAll('.step').forEach(s => s.classList.remove('on'));
   hideProg();
-  const msgs = {
-    ret:          `<strong>${nome}</strong>, sua solicitação foi recebida. Em breve você receberá um email de confirmação e a minha secretária entrará em contato ainda hoje para agendar o seu horário.<br><br>Obrigado pela confiança no meu trabalho.`,
-    ret_sem_email:`<strong>${nome}</strong>, sua solicitação foi recebida. Como não temos seu email cadastrado, não será enviada uma confirmação por escrito — mas minha secretária entrará em contato até o final do dia para agendar o seu horário.<br><br>Obrigado pela confiança no meu trabalho.`,
-    new:          `Seus dados foram recebidos, <strong>${nome}</strong>. O contrato terapêutico foi salvo no seu dispositivo.<br><br>Escolha seu horário abaixo para concluir o agendamento:`,
-    fale:         `<strong>${nome}</strong>, sua mensagem foi recebida. Responderei em até 48h úteis.`,
-  };
-  const headings = {
-    ret:          'Solicitação enviada',
-    ret_sem_email:'Solicitação enviada',
-    new:          'Quase lá!',
-    fale:         'Mensagem enviada',
-  };
-  document.getElementById('sOk').querySelector('h2').textContent = headings[type] || 'Solicitação enviada';
-  const msgEl = document.getElementById('sOkMsg');
-  msgEl.innerHTML = msgs[type];
-  // Para novo paciente: remove restrição de largura e alinha à esquerda
-  if (type === 'new') {
-    msgEl.style.maxWidth = 'none';
-    msgEl.style.textAlign = 'left';
-  }
   document.getElementById('sOk').classList.add('on');
-  window.scrollTo(0, 0);
-
-  // ── Calendly embed após submit de novo paciente ──
-  if (type === 'new') {
-    const nomeVal  = document.getElementById('p_nome')?.value?.trim() || '';
-    const emailVal = document.getElementById('p_email')?.value?.trim() || '';
-    const container = document.getElementById('sOk');
-
-    const calWrap = document.createElement('div');
-    calWrap.style.cssText = 'margin-top:28px;border-top:1.5px solid var(--grey);padding-top:24px;text-align:left';
-    calWrap.innerHTML = `
-      <p style="font-family:var(--ft);font-size:18px;font-weight:400;color:var(--navy);margin-bottom:6px;line-height:1.2">
-        Escolha seu horário
-      </p>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:18px;line-height:1.5">
-        Selecione um slot de preferência. A confirmação chega no seu email.
-      </p>
-      <div class="calendly-inline-widget"
-           data-url="https://calendly.com/${CALENDLY_EVENT_URL}?name=${encodeURIComponent(nomeVal)}&email=${encodeURIComponent(emailVal)}&hide_gdpr_banner=1&primary_color=001941"
-           style="min-width:100%;height:660px;">
-      </div>`;
-    container.appendChild(calWrap);
-
-    // Carrega o script Calendly dinamicamente (apenas uma vez)
-    if (!document.getElementById('cal-script')) {
-      const s    = document.createElement('script');
-      s.id       = 'cal-script';
-      s.src      = 'https://assets.calendly.com/assets/external/widget.js';
-      s.async    = true;
-      document.head.appendChild(s);
-    }
-  }
+  window.scrollTo(0,0);
 }
 </script>
 </body>
