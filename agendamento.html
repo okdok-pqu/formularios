@@ -525,8 +525,10 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
 // ════════════════════════════════════════════════
 const MAKE_WEBHOOK = 'https://hook.eu1.make.com/opb3o4rmutlu1ybd4lwecp8aor6b3tdu';
 
-// Slug do seu perfil Calendly — ex.: 'albertpsiquiatra'
-const CALENDLY_USERNAME = 'agenda-dr-albert';
+// URL completa do event type no Calendly (copie direto do seu painel Calendly)
+// Abra seu Calendly → clique no event type → "Copy Link" → cole só o caminho após calendly.com/
+// Ex.: 'agenda-dr-albert/primeira-consulta-psiquiatria'
+const CALENDLY_EVENT_URL = 'agenda-dr-albert'; // ← SUBSTITUIR pelo caminho real
 
 // ════════════════════════════════════════════════
 // STATE
@@ -1234,12 +1236,23 @@ function showOk(type, nome, email) {
   const msgs = {
     ret:          `<strong>${nome}</strong>, sua solicitação foi recebida. Em breve você receberá um email de confirmação e a minha secretária entrará em contato ainda hoje para agendar o seu horário.<br><br>Obrigado pela confiança no meu trabalho.`,
     ret_sem_email:`<strong>${nome}</strong>, sua solicitação foi recebida. Como não temos seu email cadastrado, não será enviada uma confirmação por escrito — mas minha secretária entrará em contato até o final do dia para agendar o seu horário.<br><br>Obrigado pela confiança no meu trabalho.`,
-    new:          `<strong>${nome}</strong>, seus dados foram recebidos com sucesso.<br><br>Uma cópia do <strong>Contrato Terapêutico</strong> com seu aceite digital foi salva no seu dispositivo (pasta Downloads).<br><br>Agora escolha seu horário abaixo — você receberá a confirmação por email automaticamente.`,
+    new:          `Seus dados foram recebidos, <strong>${nome}</strong>. O contrato terapêutico foi salvo no seu dispositivo.<br><br>Escolha seu horário abaixo para concluir o agendamento:`,
     fale:         `<strong>${nome}</strong>, sua mensagem foi recebida. Responderei em até 48h úteis.`,
   };
-  document.getElementById('sOk').querySelector('h2').textContent =
-    type === 'fale' ? 'Mensagem enviada' : 'Solicitação enviada';
-  document.getElementById('sOkMsg').innerHTML = msgs[type];
+  const headings = {
+    ret:          'Solicitação enviada',
+    ret_sem_email:'Solicitação enviada',
+    new:          'Quase lá!',
+    fale:         'Mensagem enviada',
+  };
+  document.getElementById('sOk').querySelector('h2').textContent = headings[type] || 'Solicitação enviada';
+  const msgEl = document.getElementById('sOkMsg');
+  msgEl.innerHTML = msgs[type];
+  // Para novo paciente: remove restrição de largura e alinha à esquerda
+  if (type === 'new') {
+    msgEl.style.maxWidth = 'none';
+    msgEl.style.textAlign = 'left';
+  }
   document.getElementById('sOk').classList.add('on');
   window.scrollTo(0, 0);
 
@@ -1259,7 +1272,7 @@ function showOk(type, nome, email) {
         Selecione um slot de preferência. A confirmação chega no seu email.
       </p>
       <div class="calendly-inline-widget"
-           data-url="https://calendly.com/${CALENDLY_USERNAME}/primeira-consulta?name=${encodeURIComponent(nomeVal)}&email=${encodeURIComponent(emailVal)}&hide_gdpr_banner=1&primary_color=001941"
+           data-url="https://calendly.com/${CALENDLY_EVENT_URL}?name=${encodeURIComponent(nomeVal)}&email=${encodeURIComponent(emailVal)}&hide_gdpr_banner=1&primary_color=001941"
            style="min-width:100%;height:660px;">
       </div>`;
     container.appendChild(calWrap);
