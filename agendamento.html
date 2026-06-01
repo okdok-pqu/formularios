@@ -27,8 +27,9 @@
 body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-height:100vh;padding:40px 20px 80px}
 .shell{max-width:600px;margin:0 auto}
 
-/* ── Progress (3 barras) ── */
+/* ── Progress (dinâmico) ── */
 .prog-wrap{display:flex;align-items:center;gap:5px;margin-bottom:32px}
+.prog-bars{display:flex;flex:1;gap:5px}
 .prog-bar{flex:1;height:3px;background:var(--grey);border-radius:2px;transition:background .4s}
 .prog-bar.done{background:var(--navy)}
 .prog-bar.cur{background:var(--navy)}
@@ -38,7 +39,6 @@ body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-h
 .card{background:#fff;border-radius:10px;padding:40px 44px;box-shadow:0 4px 6px rgba(19,28,71,.04), 0 10px 40px rgba(19,28,71,.10)}
 @media(max-width:520px){.card{padding:26px 20px}}
 
-/* ── Calendly card — largura total, sem padding lateral ── */
 /* ── Steps ── */
 .step{display:none}.step.on{display:block}
 
@@ -74,13 +74,16 @@ body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-h
 .bc-ttl{font-family:var(--ft);font-size:14px;color:var(--navy);margin-bottom:4px;line-height:1.3}
 .bc-dsc{font-size:12px;color:var(--muted);line-height:1.4}
 
-/* ── Responsible toggle ── */
+/* ── Info block ── */
 .resp-tog{display:flex;align-items:center;gap:10px;margin-bottom:18px;cursor:pointer;user-select:none}
 .resp-tog input{width:18px;height:18px;accent-color:var(--teal);cursor:pointer}
 .resp-tog span{font-size:14px;color:var(--mid)}
 .resp-blk{display:none;background:var(--cream);border-radius:8px;padding:20px;margin-bottom:18px}
 .resp-blk.on{display:block}
 .blk-lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.info-list{list-style:none;display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--mid);line-height:1.5}
+.info-list li{display:flex;gap:9px}
+.info-list .ck{color:var(--teal);font-weight:700;flex-shrink:0}
 
 /* ── Option cards (farmacogenética) ── */
 .oc-list{display:flex;flex-direction:column;gap:10px}
@@ -122,21 +125,6 @@ body{font-family:var(--fb);font-size:16px;color:var(--mid);background:#fff;min-h
 /* ── Divider ── */
 hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
 
-/* ── No-email toggle ── */
-.noemail-tog{display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;user-select:none}
-.noemail-tog input[type=checkbox]{position:absolute;opacity:0;width:0;height:0}
-.noemail-box{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--muted);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background var(--tr),border-color var(--tr)}
-.noemail-tog input:checked ~ .noemail-box{background:var(--teal);border-color:var(--teal)}
-.noemail-box svg{display:none;width:10px;height:10px;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.noemail-tog input:checked ~ .noemail-box svg{display:block}
-.noemail-lbl{font-size:13px;color:var(--mid);line-height:1}
-
-/* ── No-email note ── */
-.no-email-note{display:none;align-items:flex-start;gap:9px;background:rgba(0,25,65,.04);border:1px solid rgba(0,25,65,.1);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--mid);line-height:1.55;margin-top:10px;margin-bottom:4px}
-.no-email-note.on{display:flex}
-.no-email-note svg{flex-shrink:0;margin-top:1px;stroke:var(--muted)}
-
-/* ── Calendly step ── */
 /* ── Success (só para fale comigo) ── */
 .succ{display:none;text-align:center;padding:16px 0 8px}
 .succ.on{display:block}
@@ -148,12 +136,10 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
 <body>
 <div class="shell">
 
-  <!-- Progress (3 barras — só para novo paciente) -->
-  <div class="prog-wrap" id="pw">
-    <div class="prog-bar cur" id="pb0"></div>
-    <div class="prog-bar"     id="pb1"></div>
-    <div class="prog-bar"     id="pb2"></div>
-    <span class="prog-lbl" id="plbl">Etapa 1 de 3</span>
+  <!-- Progress (dinâmico — usado apenas no fluxo de retorno) -->
+  <div class="prog-wrap" id="pw" style="display:none">
+    <div class="prog-bars" id="pbars"></div>
+    <span class="prog-lbl" id="plbl"></span>
   </div>
 
   <div class="card" id="mainCard">
@@ -196,97 +182,10 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
       </div>
     </div>
 
-    <!-- ══ STEP RETORNO ══ -->
-    <div class="step" id="sR">
-      <div class="ttl">Consulta de retorno</div>
-      <div class="sub">Confirme seus dados para prosseguir ao agendamento.</div>
-
-      <div class="f" id="fR_nome">
-        <label>Nome completo <span class="req">*</span></label>
-        <input type="text" id="r_nome" placeholder="Como consta no seu cadastro">
-        <span class="ferr">Campo obrigatório</span>
-      </div>
-
-      <div class="f" id="fR_email">
-        <label>E-mail cadastrado <span class="req">*</span></label>
-        <input type="email" id="r_email" placeholder="seu@email.com">
-        <span class="ferr">E-mail inválido</span>
-        <label class="noemail-tog">
-          <input type="checkbox" id="chkNoEmail" onchange="togNoEmail()">
-          <span class="noemail-box">
-            <svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3"/></svg>
-          </span>
-          <span class="noemail-lbl">Não lembro qual email cadastrei</span>
-        </label>
-      </div>
-
-      <div class="no-email-note" id="noEmailNote">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Sem problema — você pode prosseguir. O Calendly pedirá seu email ao confirmar o horário.
-      </div>
-
-      <hr class="dv">
-
-      <div class="f">
-        <label>Algum assunto específico? <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
-        <textarea id="r_obs" placeholder="Pode deixar em branco"></textarea>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn btn-g" onclick="goto('s0')">← Voltar</button>
-        <button class="btn btn-p" id="bRsub" onclick="submitRet()">
-          <span class="lbl">Escolher horário →</span><span class="spin"></span>
-        </button>
-      </div>
-    </div>
-
-    <!-- ══ STEP 1 : Dados pessoais ══ -->
-    <div class="step" id="s1">
-      <div class="ttl">Seus dados</div>
-      <div class="sub">Informações necessárias para o cadastro.</div>
-
-      <label class="resp-tog">
-        <input type="checkbox" id="chkResp" onchange="togResp()">
-        <span>Estou agendando para outra pessoa (filho, familiar, etc.)</span>
-      </label>
-
-      <div class="f" id="f_nome"><label>Nome completo do paciente <span class="req">*</span></label><input type="text" id="p_nome" placeholder="Nome completo"><span class="ferr">Campo obrigatório</span></div>
-      <div class="f" id="f_nasc"><label>Data de nascimento <span class="req">*</span></label><input type="date" id="p_nasc"><span class="ferr">Campo obrigatório</span></div>
-      <div class="f" id="f_cpf"><label>CPF <span class="req">*</span></label><input type="text" id="p_cpf" placeholder="000.000.000-00" maxlength="14" oninput="mCPF(this)"><span class="ferr">CPF inválido</span></div>
-      <div class="f" id="f_tel">
-        <label>Celular <span class="req">*</span></label>
-        <div class="ph-row">
-          <select id="p_ddi"><option value="+55">🇧🇷 +55</option><option value="+1">🇺🇸 +1</option><option value="+39">🇮🇹 +39</option><option value="+351">🇵🇹 +351</option><option value="+49">🇩🇪 +49</option><option value="+34">🇪🇸 +34</option></select>
-          <input type="tel" id="p_tel" placeholder="(11) 99999-9999" oninput="mTel(this)">
-        </div>
-        <span class="ferr">Campo obrigatório</span>
-      </div>
-      <div class="f" id="f_email"><label>E-mail <span class="req">*</span></label><input type="email" id="p_email" placeholder="seu@email.com"><span class="ferr">E-mail inválido</span></div>
-
-      <div class="resp-blk" id="respBlk">
-        <div class="blk-lbl">Dados de quem está agendando</div>
-        <div class="f" id="f_r_nome"><label>Nome do responsável <span class="req">*</span></label><input type="text" id="resp_nome" placeholder="Nome completo"><span class="ferr">Campo obrigatório</span></div>
-        <div class="f" id="f_r_tel">
-          <label>Celular do responsável <span class="req">*</span></label>
-          <div class="ph-row">
-            <select id="resp_ddi"><option value="+55">🇧🇷 +55</option><option value="+1">🇺🇸 +1</option><option value="+39">🇮🇹 +39</option></select>
-            <input type="tel" id="resp_tel" placeholder="(11) 99999-9999" oninput="mTel(this)">
-          </div>
-          <span class="ferr">Campo obrigatório</span>
-        </div>
-        <div class="f"><label>Relação com o paciente</label><input type="text" id="resp_rel" placeholder="Ex: mãe, pai, cônjuge…"></div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn btn-g" onclick="goto('s0')">← Voltar</button>
-        <button class="btn btn-p" onclick="valS1()"><span class="lbl">Continuar →</span></button>
-      </div>
-    </div>
-
-    <!-- ══ STEP 2 : Farmacogenética ══ -->
+    <!-- ══ RETORNO · Tela 1 : Farmacogenética ══ -->
     <div class="step" id="s2">
       <div class="ttl">Testagem farmacogenética</div>
-      <div class="sub">Qual é o seu interesse em relação à testagem farmacogenética?</div>
+      <div class="sub">Qual é o seu interesse em relação à testagem farmacogenética nesta etapa do tratamento?</div>
       <div class="oc-list">
         <div class="oc" id="oc_sim" onclick="pickFarma('sim')">
           <div class="oc-dot"></div>
@@ -294,24 +193,88 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         </div>
         <div class="oc" id="oc_nao" onclick="pickFarma('nao')">
           <div class="oc-dot"></div>
-          <div><div class="oc-ttl">Prefiro iniciar sem testagem</div><div class="oc-dsc">Quero começar pelo protocolo clínico padrão</div></div>
+          <div><div class="oc-ttl">Prefiro seguir sem testagem</div><div class="oc-dsc">Quero manter o protocolo clínico padrão</div></div>
         </div>
         <div class="oc" id="oc_nd" onclick="pickFarma('nd')">
           <div class="oc-dot"></div>
-          <div><div class="oc-ttl">Ainda não sei</div><div class="oc-dsc">Prefiro discutir na primeira consulta antes de decidir</div></div>
+          <div><div class="oc-ttl">Ainda não sei</div><div class="oc-dsc">Prefiro discutir na consulta antes de decidir</div></div>
         </div>
       </div>
       <div class="ferr" id="farma_err" style="display:none;margin-top:10px">Selecione uma opção para continuar</div>
       <div class="btn-row">
-        <button class="btn btn-g" onclick="goto('s1')">← Voltar</button>
+        <button class="btn btn-g" onclick="goto('s0');hideProg()">← Voltar</button>
         <button class="btn btn-p" onclick="valS2()"><span class="lbl">Continuar →</span></button>
       </div>
     </div>
 
-    <!-- ══ STEP 3 : Contrato ══ -->
-    <div class="step" id="s4">
+    <!-- ══ RETORNO · Tela 2 : Ciência do contrato (sem download automático) ══ -->
+    <div class="step" id="sR_ciencia">
       <div class="ttl">Contrato terapêutico</div>
-      <div class="sub">Leia as condições do atendimento antes de confirmar.</div>
+      <div class="sub">Confirme que está ciente das condições do atendimento antes de prosseguir.</div>
+      <div class="ct-prev">
+        <h3>CONTRATO TERAPÊUTICO</h3>
+        <p><em>Consulta Psiquiátrica Particular — Condições do atendimento | Direitos e responsabilidades</em></p>
+        <p style="margin-top:8px">Este documento serve para tornar o tratamento previsível para os dois lados: o paciente sabe o que pode esperar; o médico pode trabalhar com organização e dedicação.</p>
+        <h4>1. Obrigações do Médico</h4>
+        <ul>
+          <li>Conduzir as consultas com base no conhecimento científico e nos princípios da Declaração de Genebra.</li>
+          <li>Manter sigilo sobre todas as informações clínicas e pessoais do paciente, mesmo após sua morte.</li>
+          <li>Comunicar diagnósticos e responder dúvidas de forma acessível.</li>
+          <li>Prescrever medicamentos com base em critérios clínicos.</li>
+          <li>Comunicar cancelamentos com 24h de antecedência, salvo motivo de força maior.</li>
+          <li>Responder mensagens fora do horário em até 24–48 horas úteis.</li>
+          <li>Fornecer resumo clínico ou prontuário a qualquer momento.</li>
+        </ul>
+        <h4>2. Responsabilidades do Paciente</h4>
+        <ul>
+          <li>Cancelar consultas com 1 dia de antecedência.</li>
+          <li>Colher exames solicitados antes da próxima consulta.</li>
+          <li>Comunicar desejo de alterar prescrição antes de fazê-lo.</li>
+          <li>Utilizar medicamentos conforme orientado.</li>
+        </ul>
+        <h4>3. Honorários e Cancelamentos</h4>
+        <ul>
+          <li>Com 1 dia ou mais de antecedência: sem cobrança.</li>
+          <li>No dia ou com menos de 12 horas de antecedência: cobrança de 30% do valor da consulta.</li>
+          <li>Cancelamentos do médico: sem ônus, reagendamento prioritário.</li>
+        </ul>
+        <h4>4. Comunicação Fora da Consulta</h4>
+        <p>WhatsApp em horário comercial. Agendamentos: Ingrid (11) 97105-7112. Avaliações e novos medicamentos requerem consulta.</p>
+        <h4>5. Plano de Segurança</h4>
+        <p>Em crise aguda: SAMU (192) ou CVV (188). Dirija-se ao Pronto-Socorro sem aguardar retorno.</p>
+        <h4>6. Telepsiquiatria</h4>
+        <p>Consultas por vídeo seguem as mesmas condições. Ambiente reservado e conexão estável.</p>
+        <h4>7. Vigência</h4>
+        <p>Prazo indeterminado a partir do aceite digital.</p>
+      </div>
+      <a class="ct-lnk" onclick="openPDF()">Ler contrato completo em nova aba ↗</a>
+      <div class="acc-row" onclick="togCiencia()">
+        <input type="checkbox" id="chkCiencia" onclick="event.stopPropagation();updCiencia()">
+        <div class="acc-txt">Declaro estar <strong>ciente</strong> dos termos do Contrato Terapêutico — direitos e responsabilidades do paciente e do médico — do Dr. Albert Felipe Mojzeszowicz (CRM-SP 175671).</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-g" onclick="setProgress(1,2);goto('s2')">← Voltar</button>
+        <button class="btn btn-p" id="bRsub" onclick="submitRet()" disabled>
+          <span class="lbl">Confirmar — escolher horário →</span><span class="spin"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ CASO NOVO · Tela única : Como funciona + aceite (download automático) ══ -->
+    <div class="step" id="sN_contrato">
+      <div class="ttl">Primeira consulta</div>
+      <div class="sub">Veja como funciona o atendimento, aceite os termos e escolha seu horário.</div>
+
+      <div class="resp-blk on" style="display:block;margin-bottom:24px">
+        <div class="blk-lbl">Como funciona</div>
+        <p style="font-size:14px;color:var(--mid);line-height:1.6;margin-bottom:14px">O acompanhamento é conduzido pessoalmente pelo Dr. Albert, com base em critérios clínicos e científicos.</p>
+        <ul class="info-list">
+          <li><span class="ck">✓</span><span><strong>Atendimento exclusivamente online</strong>, por videoconferência — você é atendido onde estiver, sem deslocamento e com total privacidade.</span></li>
+          <li><span class="ck">✓</span><span>Para a consulta, garanta um <strong>ambiente reservado</strong> e conexão estável.</span></li>
+          <li><span class="ck">✓</span><span>Nome e e-mail são informados ao escolher o horário; nascimento, CPF e endereço são coletados depois, pela secretaria.</span></li>
+        </ul>
+      </div>
+
       <div class="ct-prev">
         <h3>CONTRATO TERAPÊUTICO</h3>
         <p><em>Consulta Psiquiátrica Particular — Condições do atendimento | Direitos e responsabilidades</em></p>
@@ -354,9 +317,9 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         <div class="acc-txt">Li e aceito os termos do <strong>Contrato Terapêutico</strong> do Dr. Albert Felipe Mojzeszowicz (CRM-SP 175671).</div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-g" onclick="goto('s2')">← Voltar</button>
+        <button class="btn btn-g" onclick="goto('s0');hideProg()">← Voltar</button>
         <button class="btn btn-p" id="bSub" onclick="submitNew()" disabled>
-          <span class="lbl">Aceito — escolher horário →</span><span class="spin"></span>
+          <span class="lbl">Prosseguir →</span><span class="spin"></span>
         </button>
       </div>
     </div>
@@ -367,7 +330,7 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         <div class="succ-ico" style="margin-bottom:20px">✓</div>
         <div class="ttl" style="margin-bottom:8px">Quase lá!</div>
         <p class="sub" id="calSub" style="margin-bottom:28px;max-width:340px;margin-left:auto;margin-right:auto">
-          Seus dados foram recebidos. Agora escolha seu horário.
+          Agora escolha seu horário.
         </p>
         <a id="calLink" href="#" target="_blank" rel="noopener"
            class="btn btn-p"
@@ -376,7 +339,7 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         </a>
         <p style="font-size:13px;color:var(--muted);margin-top:20px;line-height:1.6">
           O link abre numa nova aba.<br>
-          Você precisará confirmar seu nome e email no Calendly.<br>
+          Você informará seu nome e email no Calendly.<br>
           A confirmação chega no seu email ao concluir.
         </p>
       </div>
@@ -416,7 +379,7 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
         <span class="ferr" id="f_msg_err">Campo obrigatório</span>
       </div>
       <div class="btn-row">
-        <button class="btn btn-g" onclick="goto('s0')">← Voltar</button>
+        <button class="btn btn-g" onclick="goto('s0');hideProg()">← Voltar</button>
         <button class="btn btn-p" id="bFsub" onclick="submitFale()">
           <span class="lbl">Enviar mensagem</span><span class="spin"></span>
         </button>
@@ -437,13 +400,14 @@ hr.dv{border:none;border-top:1.5px solid var(--grey);margin:24px 0}
 // ════════════════════════════════════════════════
 // ⚙️  CONFIGURAÇÃO
 // ════════════════════════════════════════════════
-const MAKE_WEBHOOK   = 'https://hook.eu1.make.com/opb3o4rmutlu1ybd4lwecp8aor6b3tdu';
+const MAKE_WEBHOOK   = 'https://hook.eu1.make.com/lcyvevg6q6mqvh6mv88l2s1omk7e8a52';
 const CALENDLY_EVENT = 'agenda-dr-albert/agenda-dr-albert';
 
 // ════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════
-let flow = null, farma = null, acceptTS = null;
+let flow = null, farma = null, acceptTS = null, cienciaTS = null;
+const farmaMap = {sim:'Sim — quer testagem', nao:'Não — protocolo padrão', nd:'A decidir na consulta'};
 
 // ════════════════════════════════════════════════
 // ENTRY POINT — suporte a ?fale=1 e #fale
@@ -465,14 +429,17 @@ function goto(id) {
   window.scrollTo(0, 0);
 }
 
-function setProgress(cur) {
-  ['pb0','pb1','pb2'].forEach((id, i) => {
-    const b = document.getElementById(id);
-    b.classList.remove('cur','done');
-    if (i < cur - 1)     b.classList.add('done');
-    else if (i === cur - 1) b.classList.add('cur');
-  });
-  document.getElementById('plbl').textContent = `Etapa ${cur} de 3`;
+function setProgress(cur, total) {
+  const pw = document.getElementById('pw');
+  const bars = document.getElementById('pbars');
+  bars.innerHTML = '';
+  for (let i = 1; i <= total; i++) {
+    const b = document.createElement('div');
+    b.className = 'prog-bar' + (i < cur ? ' done' : (i === cur ? ' cur' : ''));
+    bars.appendChild(b);
+  }
+  document.getElementById('plbl').textContent = `Etapa ${cur} de ${total}`;
+  pw.style.display = 'flex';
 }
 
 function hideProg() {
@@ -493,36 +460,14 @@ function pickFlow(f) {
 
 function goFromS0() {
   if (!flow) return;
-  if (flow === 'ret')  { hideProg(); goto('sR'); }
-  if (flow === 'new')  { setProgress(1); goto('s1'); }
+  if (flow === 'ret')  { setProgress(1, 2); goto('s2'); }      // retorno → farmacogenética
+  if (flow === 'new')  { hideProg(); goto('sN_contrato'); }    // caso novo → tela única
   if (flow === 'fale') { hideProg(); goto('sFale'); }
 }
 
 // ════════════════════════════════════════════════
-// MASKS & VALIDATORS
+// VALIDATORS (Fale comigo)
 // ════════════════════════════════════════════════
-function mCPF(el) {
-  let v = el.value.replace(/\D/g,'');
-  if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');
-  else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');
-  else if (v.length > 3) v = v.replace(/(\d{3})(\d{0,3})/,'$1.$2');
-  el.value = v;
-}
-function mTel(el) {
-  let v = el.value.replace(/\D/g,'');
-  if (v.length > 10) v = v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
-  else if (v.length > 6) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
-  else if (v.length > 2) v = v.replace(/(\d{2})(\d{0,5})/,'($1) $2');
-  el.value = v;
-}
-function okCPF(c) {
-  c = c.replace(/\D/g,'');
-  if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
-  let s=0; for(let i=0;i<9;i++) s+=+c[i]*(10-i);
-  let r=(s*10)%11; if(r===10||r===11)r=0; if(r!==+c[9]) return false;
-  s=0; for(let i=0;i<10;i++) s+=+c[i]*(11-i);
-  r=(s*10)%11; if(r===10||r===11)r=0; return r===+c[10];
-}
 function req(fid, iid, fn) {
   const el = document.getElementById(fid), v = document.getElementById(iid).value.trim();
   const ok = fn ? fn(v) : v.length > 0;
@@ -533,31 +478,7 @@ function updChar() {
 }
 
 // ════════════════════════════════════════════════
-// STEP 1 — Dados pessoais
-// ════════════════════════════════════════════════
-function togResp() {
-  document.getElementById('respBlk').classList.toggle('on', document.getElementById('chkResp').checked);
-}
-function valS1() {
-  const ok = [
-    req('f_nome','p_nome'),
-    req('f_nasc','p_nasc'),
-    req('f_cpf','p_cpf', v => okCPF(v)),
-    req('f_tel','p_tel', v => v.replace(/\D/g,'').length >= 10),
-    req('f_email','p_email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)),
-  ].every(Boolean);
-  let okR = true;
-  if (document.getElementById('chkResp').checked) {
-    okR = [
-      req('f_r_nome','resp_nome'),
-      req('f_r_tel','resp_tel', v => v.replace(/\D/g,'').length >= 10),
-    ].every(Boolean);
-  }
-  if (ok && okR) { setProgress(2); goto('s2'); }
-}
-
-// ════════════════════════════════════════════════
-// STEP 2 — Farmacogenética
+// RETORNO · Tela 1 — Farmacogenética
 // ════════════════════════════════════════════════
 function pickFarma(v) {
   farma = v;
@@ -566,11 +487,21 @@ function pickFarma(v) {
 }
 function valS2() {
   if (!farma) { document.getElementById('farma_err').style.display = 'block'; return; }
-  setProgress(3); goto('s4');
+  setProgress(2, 2); goto('sR_ciencia');
 }
 
 // ════════════════════════════════════════════════
-// STEP 3 — Contrato
+// RETORNO · Tela 2 — Ciência do contrato
+// ════════════════════════════════════════════════
+function togCiencia() { const c = document.getElementById('chkCiencia'); c.checked = !c.checked; updCiencia(); }
+function updCiencia() {
+  const c = document.getElementById('chkCiencia').checked;
+  document.getElementById('bRsub').disabled = !c;
+  if (c) cienciaTS = new Date().toISOString();
+}
+
+// ════════════════════════════════════════════════
+// CASO NOVO — Aceite do contrato
 // ════════════════════════════════════════════════
 function togAcc() { const c = document.getElementById('chkAcc'); c.checked = !c.checked; updAcc(); }
 function updAcc() {
@@ -580,19 +511,15 @@ function updAcc() {
 }
 
 // ════════════════════════════════════════════════
-// PDF — Contrato Terapêutico v7
+// PDF — Contrato Terapêutico v7 (modelo genérico, sem dados do paciente)
+// Identificação e assinatura ficam em branco para preenchimento posterior.
 // ════════════════════════════════════════════════
 function buildPDFDoc() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit:'mm', format:'a4' });
 
-  const nome    = document.getElementById('p_nome').value.trim();
-  const nasc    = document.getElementById('p_nasc').value;
-  const cpf     = document.getElementById('p_cpf').value.trim();
-  const tel     = document.getElementById('p_ddi').value + ' ' + document.getElementById('p_tel').value.trim();
-  const email   = document.getElementById('p_email').value.trim();
-  const hoje    = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-  const nascFmt = nasc ? new Date(nasc+'T00:00:00').toLocaleDateString('pt-BR') : '';
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const aceiteTS = acceptTS || cienciaTS;
 
   const ML=20,MR=20,MT=18,MB=20,PW=210,PH=297,CW=PW-ML-MR;
   const NAVY=[0,25,65];
@@ -630,18 +557,17 @@ function buildPDFDoc() {
   doc.setFont('helvetica','italic'); doc.setFontSize(9); doc.text('Condições do atendimento  |  Direitos e responsabilidades',ML,y); y+=6;
   rule();
 
-  heading('ACEITE DIGITAL',{size:10,before:0,after:1});
-  para(`Aceito por: ${nome}`,{size:9,leading:4.2});
-  para(`CPF: ${cpf}`,{size:9,leading:4.2});
-  para(`Timestamp: ${new Date(acceptTS).toLocaleString('pt-BR')}`,{size:9,leading:4.2});
-  space(2);
+  if (aceiteTS) {
+    heading('ACEITE DIGITAL',{size:10,before:0,after:1});
+    para(`Termos aceitos digitalmente em: ${new Date(aceiteTS).toLocaleString('pt-BR')}`,{size:9,leading:4.2});
+    space(2);
+  }
 
   heading('IDENTIFICAÇÃO DO PACIENTE',{size:10,before:1,after:1});
-  para(`Nome: ${nome}`,{size:9,leading:4.2});
-  para(`Nascimento: ${nascFmt}`,{size:9,leading:4.2});
-  para(`CPF: ${cpf}`,{size:9,leading:4.2});
-  para(`Telefone: ${tel.trim()}`,{size:9,leading:4.2});
-  para(`E-mail: ${email}`,{size:9,leading:4.2});
+  para('Nome: ________________________________________________',{size:9,leading:5});
+  para('Nascimento: ____ / ____ / ________      CPF: ____________________',{size:9,leading:5});
+  para('Telefone: ____________________      E-mail: ____________________',{size:9,leading:5});
+  para('Endereço: ______________________________________________',{size:9,leading:5});
   space(2); rule();
 
   para('Este documento serve para tornar o tratamento previsível para os dois lados: o paciente sabe o que pode esperar; o médico pode trabalhar com organização e dedicação.');
@@ -710,10 +636,10 @@ function buildPDFDoc() {
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setDrawColor(80); doc.setLineWidth(0.3);
   doc.line(ML,y,ML+75,y); doc.line(PW-MR-75,y,PW-MR,y); y+=4;
   doc.text('Dr. Albert Felipe Mojzeszowicz',ML,y);
-  doc.text(nome||'Paciente',PW-MR-75,y); y+=4;
+  doc.text('Paciente',PW-MR-75,y); y+=4;
   doc.setFontSize(8); doc.setTextColor(100);
   doc.text('CRM-SP 175671  |  RQE 87037',ML,y);
-  doc.text(`Aceite digital — ${new Date(acceptTS).toLocaleString('pt-BR')}`,PW-MR-75,y);
+  if (aceiteTS) doc.text(`Aceite digital — ${new Date(aceiteTS).toLocaleString('pt-BR')}`,PW-MR-75,y);
   doc.setTextColor(0);
 
   const pc = doc.internal.getNumberOfPages();
@@ -727,7 +653,7 @@ function buildPDFDoc() {
 
 function openPDF() {
   try { window.open(buildPDFDoc().output('bloburl'),'_blank'); }
-  catch(e) { alert('Preencha seus dados (etapa 1) antes de visualizar o contrato personalizado.'); }
+  catch(e) { console.error('PDF error:', e); }
 }
 
 // ════════════════════════════════════════════════
@@ -744,151 +670,55 @@ async function postWebhook(payload) {
 
 // ════════════════════════════════════════════════
 // SHOW CALENDLY — abre em nova aba (sem iframe aninhado)
-// O Calendly inline dentro do HTML element do Wix é bloqueado
-// por política de cookies cross-origin. Botão + nova aba é
-// a única abordagem confiável nesse contexto.
+// O paciente preenche nome/email no próprio Calendly.
 // ════════════════════════════════════════════════
-function showCalendly(nome, email, subtitle) {
+function showCalendly(subtitle) {
   if (subtitle) document.getElementById('calSub').textContent = subtitle;
-
-  // Sem parâmetros de prefill: Calendly bloqueia agendamentos
-  // com nome/email pré-preenchidos via URL (falso positivo de bot detection).
-  // O paciente preenche os dois campos no próprio Calendly.
-  const url = `https://calendly.com/${CALENDLY_EVENT}`;
-
-  document.getElementById('calLink').href = url;
+  document.getElementById('calLink').href = `https://calendly.com/${CALENDLY_EVENT}`;
   hideProg();
   goto('sCalendly');
 }
 
 // ════════════════════════════════════════════════
-// RETORNO — toggle no-email
-// ════════════════════════════════════════════════
-let retSemEmail = false;
-function togNoEmail() {
-  retSemEmail = document.getElementById('chkNoEmail').checked;
-  const inp  = document.getElementById('r_email');
-  const note = document.getElementById('noEmailNote');
-  const err  = document.getElementById('fR_email');
-  if (retSemEmail) {
-    inp.style.opacity='0.4'; inp.style.pointerEvents='none'; inp.value='';
-    err.classList.remove('err'); note.classList.add('on');
-  } else {
-    inp.style.opacity='1'; inp.style.pointerEvents='auto'; note.classList.remove('on');
-  }
-}
-
-// ════════════════════════════════════════════════
-// SUBMIT — RETORNO
+// SUBMIT — RETORNO  (sem download automático)
 // ════════════════════════════════════════════════
 async function submitRet() {
-  const nome = document.getElementById('r_nome').value.trim();
-  document.getElementById('fR_nome').classList.toggle('err', !nome);
-  if (!nome) return;
-
-  let emailRet = '';
-  if (!retSemEmail) {
-    emailRet = document.getElementById('r_email').value.trim();
-    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailRet);
-    document.getElementById('fR_email').classList.toggle('err', !ok);
-    if (!ok) return;
-  }
-
   const btn = document.getElementById('bRsub');
+  if (btn.disabled) return;
   btn.classList.add('ld'); btn.disabled = true;
 
-  const obs = document.getElementById('r_obs').value.trim();
-
-  // Envia contexto ao Make.com (notifica Albert)
   await postWebhook({
-    type:         'retorno',
-    patient_name: nome,
-    patient_email:emailRet,
-    obs:          obs,
-    timestamp:    new Date().toLocaleString('pt-BR'),
+    type:               'retorno',
+    farmacogenetica:    farmaMap[farma] || '',
+    ciencia_aceite_em:  cienciaTS ? new Date(cienciaTS).toLocaleString('pt-BR') : '',
+    timestamp:          new Date().toLocaleString('pt-BR'),
   });
 
-  showCalendly(
-    nome,
-    emailRet || '',
-    'Escolha o horário para sua consulta de retorno.'
-  );
+  showCalendly('Escolha o horário para sua consulta de retorno.');
 }
 
 // ════════════════════════════════════════════════
-// SUBMIT — NOVO PACIENTE
+// SUBMIT — CASO NOVO  (download automático do termo)
 // ════════════════════════════════════════════════
 async function submitNew() {
   const btn = document.getElementById('bSub');
+  if (btn.disabled) return;
   btn.classList.add('ld'); btn.disabled = true;
 
-  const nome    = document.getElementById('p_nome').value.trim();
-  const nasc    = document.getElementById('p_nasc').value;
-  const cpf     = document.getElementById('p_cpf').value.trim();
-  const ddi     = document.getElementById('p_ddi').value;
-  const tel     = ddi + ' ' + document.getElementById('p_tel').value.trim();
-  const email   = document.getElementById('p_email').value.trim();
-  const nascFmt = nasc ? new Date(nasc+'T00:00:00').toLocaleDateString('pt-BR') : '';
-  const farmaMap= {sim:'Sim — quer testagem',nao:'Não — protocolo padrão',nd:'A decidir na consulta'};
-  const obs     = document.getElementById('n_obs')?.value?.trim() || '';
-  const ts      = new Date().toLocaleString('pt-BR');
-
-  let resp = '';
-  if (document.getElementById('chkResp').checked) {
-    const rNome = document.getElementById('resp_nome').value.trim();
-    const rTel  = document.getElementById('resp_ddi').value + ' ' + document.getElementById('resp_tel').value.trim();
-    const rRel  = document.getElementById('resp_rel').value.trim() || 'não informado';
-    resp = `\nRESPONSÁVEL\nNome: ${rNome}\nCelular: ${rTel}\nRelação: ${rRel}`;
-  }
-
-  const body =
-`════════════════════════════════════
-PRIMEIRA CONSULTA — ${nome}
-════════════════════════════════════
-
-DADOS DO PACIENTE
-
-Nome           : ${nome}
-Nascimento     : ${nascFmt}
-CPF            : ${cpf}
-Celular        : ${tel.trim()}
-E-mail         : ${email}
-${resp}
-
-────────────────────────────────────
-
-FARMACOGENÉTICA  ${farmaMap[farma]}
-
-${obs ? 'OBSERVAÇÕES\n\n' + obs + '\n\n' : ''}────────────────────────────────────
-
-CONTRATO TERAPÊUTICO
-
-Aceito digitalmente em: ${new Date(acceptTS).toLocaleString('pt-BR')}
-PDF do contrato em anexo.
-
-════════════════════════════════════
-Enviado em: ${ts}`;
-
-  // Gera e baixa o PDF para o paciente
-  let pdf64 = '';
+  // Download automático do termo (modelo genérico — paciente guarda sua cópia)
   try {
     const pdfDoc = buildPDFDoc();
-    const safeNome = nome.replace(/[^\w\s-]/g,'').replace(/\s+/g,'_');
-    pdfDoc.save(`Contrato_Terapeutico_${safeNome}.pdf`);
-    pdf64 = pdfDoc.output('datauristring').split(',')[1];
+    pdfDoc.save('Contrato_Terapeutico_Dr_Albert.pdf');
   } catch(e) { console.error('PDF error:', e); }
 
-  // Envia ao Make.com (Albert recebe email com dados + PDF)
   await postWebhook({
-    type:          'nova_consulta',
-    subject:       `PRIMEIRA CONSULTA — ${nome}`,
-    body:          body,
-    patient_name:  nome,
-    patient_email: email,
-    pdf_base64:    pdf64,
+    type:                'nova_consulta',
+    subject:             'PRIMEIRA CONSULTA — novo paciente',
+    contrato_aceite_em:  acceptTS ? new Date(acceptTS).toLocaleString('pt-BR') : '',
+    timestamp:           new Date().toLocaleString('pt-BR'),
   });
 
-  showCalendly(nome, email, 'Escolha o horário para sua primeira consulta.');
+  showCalendly('Escolha o horário para sua primeira consulta.');
 }
 
 // ════════════════════════════════════════════════
